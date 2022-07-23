@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -60,7 +61,14 @@ class _BookWidgetState extends State<BookWidget> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.blueGrey),),
-            leading: Image.network(widget._thumbnail ?? "",),
+            // leading: Image.network(widget._thumbnail ?? "",),
+            leading: Container(
+              height: 100,
+              width: 50,
+              child: CachedNetworkImage(
+                imageUrl: widget._thumbnail ?? "",
+              ),
+            ),
             trailing:Icon(LineAwesomeIcons.angle_right, color: Colors.blue.shade900,),
             subtitle: Text('Auteur: (${widget._author ?? '-'})',
                 maxLines: 1,

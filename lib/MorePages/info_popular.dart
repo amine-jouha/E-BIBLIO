@@ -19,6 +19,7 @@ class _InfoPopularState extends State<InfoPopular> {
   final ScrollController _scrollController = ScrollController();
   HomeProvider? _provider;
   RefreshController _controller1 = RefreshController();
+  bool? _onCharge;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _InfoPopularState extends State<InfoPopular> {
     _provider!.query;
     _provider!.books;
     _provider?.getBooks();
+    _onCharge = true;
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -41,10 +43,12 @@ class _InfoPopularState extends State<InfoPopular> {
   }
 
   void _onRefresh() {
-    Future.delayed(const Duration(milliseconds: 2009)).then((val) {
+    Future.delayed(const Duration(milliseconds: 800)).then((val) {
       _controller1.refreshCompleted();
       _provider!.query;
       _provider?.getBooks();
+      _onCharge = false;
+      // amine oublie pas ça
 //                refresher.sendStatus(RefreshStatus.completed);
     });
   }
@@ -57,7 +61,14 @@ class _InfoPopularState extends State<InfoPopular> {
       appBar: AppBar(
         title: Text('Popular Books'),
       ),
-      body: Consumer<HomeProvider>(
+      body: _onCharge!
+        ? Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: LoadingAnimationWidget.threeArchedCircle(
+          size: 30, color: Colors.lightBlueAccent,
+        ),
+      )
+      : Consumer<HomeProvider>(
         builder: (context, provideer, widget) => NotificationListener<ScrollEndNotification>(
 
           onNotification: (ScrollNotification notification) {
