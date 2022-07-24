@@ -19,7 +19,6 @@ class _InfoPopularState extends State<InfoPopular> {
   final ScrollController _scrollController = ScrollController();
   HomeProvider? _provider;
   RefreshController _controller1 = RefreshController();
-  bool? _onCharge;
 
   @override
   void initState() {
@@ -27,8 +26,10 @@ class _InfoPopularState extends State<InfoPopular> {
     _provider = Provider.of<HomeProvider>(context, listen: false);
     _provider!.query;
     _provider!.books;
+    _provider!.isLoading =true;
     _provider?.getBooks();
-    _onCharge = true;
+
+
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -47,7 +48,6 @@ class _InfoPopularState extends State<InfoPopular> {
       _controller1.refreshCompleted();
       _provider!.query;
       _provider?.getBooks();
-      _onCharge = false;
       // amine oublie pas ça
 //                refresher.sendStatus(RefreshStatus.completed);
     });
@@ -61,14 +61,7 @@ class _InfoPopularState extends State<InfoPopular> {
       appBar: AppBar(
         title: Text('Popular Books'),
       ),
-      body: _onCharge!
-        ? Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: LoadingAnimationWidget.threeArchedCircle(
-          size: 30, color: Colors.lightBlueAccent,
-        ),
-      )
-      : Consumer<HomeProvider>(
+      body: Consumer<HomeProvider>(
         builder: (context, provideer, widget) => NotificationListener<ScrollEndNotification>(
 
           onNotification: (ScrollNotification notification) {
@@ -80,7 +73,17 @@ class _InfoPopularState extends State<InfoPopular> {
             return true;
 
           },
-          child: SmartRefresher(
+          child: provideer.isLoading!
+          ? Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: LoadingAnimationWidget.threeArchedCircle(
+                size: 30, color: Colors.lightBlueAccent,
+              ),
+            ),
+          )
+          :SmartRefresher(
             enablePullDown: true,
             enablePullUp: true,
             controller: _controller1,

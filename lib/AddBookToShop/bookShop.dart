@@ -206,7 +206,7 @@ class _BookShopState extends State<BookShop> {
             padding: const EdgeInsets.only(bottom: 97),
             child: Icon(LineAwesomeIcons.envelope, size: 24,),
           ),
-          hintText: 'Description',
+          hintText: 'Description of Book',
           // isDense: true,
           // contentPadding: const EdgeInsets.symmetric(vertical: 120.0, horizontal: 10.0),
           border: OutlineInputBorder(

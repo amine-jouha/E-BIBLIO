@@ -1,4 +1,5 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/AddBookToShop/bookShop.dart';
 import 'package:ebiblio/MorePages/shop.dart';
@@ -96,13 +97,16 @@ class _BottomNavState extends State<BottomNav> {
       decoration: BoxDecoration(
           color: Colors.transparent
       ),
-      accountEmail: loggedInUser.email == null ?
-      Text('${user!.email}') :
-      Text('${loggedInUser.email}'),
+      accountEmail: loggedInUser.email == null
+        ? Text('${user!.email ?? ''}')
+        : Text('${loggedInUser.email}'),
+      // oublie pas de regler le probleme du ProfilePicture twitter
       currentAccountPicture: CircleAvatar(
         backgroundImage:
         user!.photoURL != null
-            ? NetworkImage(user!.photoURL!)
+            // ? NetworkImage(user!.photoURL!)
+            ? CachedNetworkImageProvider(user!.photoURL!)
+            // ? CachedNetworkImageProvider('https://i.pinimg.com/originals/2f/11/d8/2f11d875e68791e2d29279cbff699a03.png')
             : AssetImage('assets/avatar3.png') as ImageProvider,
         // AssetImage('assets/avatar3.png'),
         // NetworkImage(user!.photoURL!),
