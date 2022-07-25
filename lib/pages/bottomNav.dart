@@ -77,6 +77,7 @@ class _BottomNavState extends State<BottomNav> {
     dynamic drawerHeader = UserAccountsDrawerHeader(
       accountName: loggedInUser.userName == null ?
       Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text('${user!.displayName}'.toUpperCase()),
           SizedBox(width: 5,),

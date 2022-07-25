@@ -1,5 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ebiblio/MorePages/bookInfos.dart';
+import 'package:ebiblio/model/Book_model.dart';
+import 'package:ebiblio/model/bookModel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+
+import '../model/userInfo_model.dart';
 
 class BookShop extends StatefulWidget {
   const BookShop({Key? key}) : super(key: key);
@@ -9,6 +17,7 @@ class BookShop extends StatefulWidget {
 }
 
 class _BookShopState extends State<BookShop> {
+  User? user = FirebaseAuth.instance.currentUser;
 
   //notre form key
   final _formKey = GlobalKey<FormState>();
@@ -131,12 +140,12 @@ class _BookShopState extends State<BookShop> {
       validator: (value)
       {
         if(value!.isEmpty) {
-          return ('Entrer votre Email');
+          return ('Enter Number of Pages!');
         }
         //reg expression for email validation
         if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value))
         {
-          return ('Entrez un Email Valid!');
+          return ('Enter a valid Number!');
         }
         return null;
       },
@@ -162,12 +171,12 @@ class _BookShopState extends State<BookShop> {
       validator: (value)
       {
         if(value!.isEmpty) {
-          return ('Entrer votre Email');
+          return ('Enter a Price');
         }
         //reg expression for email validation
         if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value))
         {
-          return ('Entrez un Email Valid!');
+          return ('Enter a valid Price!');
         }
         return null;
       },
@@ -200,10 +209,10 @@ class _BookShopState extends State<BookShop> {
         RegExp regex = new RegExp(r'^.{3,}$');
         if(value!.isEmpty)
         {
-          return ('Metez un msg');
+          return ('Give a Description of book');
         }
         if(!regex.hasMatch(value)) {
-          return ('Entrer un Message Valid(Min. 6 Character)');
+          return ('Entrer a Valid Description (Min. 6 Lines)');
         }
         return null;
       },
@@ -265,8 +274,16 @@ class _BookShopState extends State<BookShop> {
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-
+        onPressed: () async{
+          await AddBookToShop(
+                  TitleEditingController.text,
+                  AuthorEditingController.text,
+                  PageEditingController.text,
+                  BookDateEditingController.text,
+                  PriceEditingController.text,
+                  _currentSelectedValue!,
+                  DescriptionEditingController.text
+              );
         },
         child: Text(
           'Submit Book',
@@ -381,6 +398,48 @@ class _BookShopState extends State<BookShop> {
         ),
       )
     );
+  }
+  AddBookToShop(
+      String title,String author,String numPage,String dateBook,String price,String condition,String description) async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+    BookFormShop bookFormShop = BookFormShop();
+
+    bookFormShop.uid = user!.uid;
+    bookFormShop.title = title;
+    bookFormShop.author = author;
+    bookFormShop.numPage = numPage;
+    bookFormShop.dateBook = dateBook;
+    bookFormShop.price = price;
+    bookFormShop.condition = condition;
+    bookFormShop.description = description;
+
+
+
+
+
+    await CircularProgressIndicator();
+    Navigator.of(context).pop();
+    await firebaseFirestore.collection('BookFormShop').doc(user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
+    Fluttertoast.showToast(msg: 'Book Added successfully ${user!.displayName}');
+
+
+
+
+
+    // FirebaseFirestore.instance.collection('UserInfo').doc();
+    //  final bookModel = UserInfos(
+    //    uid : user!.uid,
+    //    ville : ville,
+    //    type : type
+    //  );
+    // await _auth.createUserWithEmailAndPassword(email: email, password: password)
+    //     .then((value) => {postDetailsToFirestore()})
+    //     .catchError((e) {
+    //   Fluttertoast.showToast(msg: e!.message);
+    // });
+
+
   }
 }
 
