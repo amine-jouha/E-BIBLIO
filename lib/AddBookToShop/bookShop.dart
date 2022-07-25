@@ -19,6 +19,14 @@ class _BookShopState extends State<BookShop> {
   final BookDateEditingController = new TextEditingController();
   final PageEditingController = new TextEditingController();
   final PriceEditingController = new TextEditingController();
+  String? _currentSelectedValue;
+
+  var _currencies = [
+    "New",
+    "First Hand",
+    "Little Damage",
+    "Damaged",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +54,7 @@ class _BookShopState extends State<BookShop> {
           prefixIcon:Icon(LineAwesomeIcons.book,),
           hintText: 'Title',
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 22.0),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10)
           )
@@ -78,7 +86,7 @@ class _BookShopState extends State<BookShop> {
           prefixIcon:Icon(LineAwesomeIcons.user),
           hintText: 'Author Name',
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 22.0),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10)
           )
@@ -109,7 +117,7 @@ class _BookShopState extends State<BookShop> {
           prefixIcon:Icon(LineAwesomeIcons.calendar),
           hintText: 'dd/mm/yyyy',
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 22.0),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10)
           )
@@ -140,7 +148,7 @@ class _BookShopState extends State<BookShop> {
           prefixIcon:Icon(LineAwesomeIcons.book_reader),
           hintText: 'Total Num Page',
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 22.0),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10)
           )
@@ -170,8 +178,10 @@ class _BookShopState extends State<BookShop> {
       decoration: InputDecoration(
           prefixIcon:Icon(LineAwesomeIcons.money_check),
           hintText: 'Price Book',
+          helperText: 'xx.xx Not xx,xx',
+          suffixText: '\$',
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 22, horizontal: 22.0),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10)
           )
@@ -215,6 +225,58 @@ class _BookShopState extends State<BookShop> {
       ),
       // maxLength: 15,
     );
+    // pour la condition du book
+    final Condition = FormField(
+      builder: (FormFieldState<String> state) {
+        return InputDecorator(
+          decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.redAccent, fontSize: 14.0),
+              errorStyle: TextStyle(color: Colors.redAccent, fontSize: 16.0),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+          ),
+          isEmpty: _currentSelectedValue == '',
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              hint: Text('Condition Book'),
+              value: _currentSelectedValue,
+              isDense: true,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _currentSelectedValue = newValue;
+                  state.didChange(newValue);
+                });
+              },
+              items: _currencies.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+    // boutton submit
+    final SubmitButton = Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(10),
+      color: Colors.brown,
+      child: MaterialButton(
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {
+
+        },
+        child: Text(
+          'Submit Book',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Book To Shop'),
@@ -228,6 +290,11 @@ class _BookShopState extends State<BookShop> {
             child: Column(
               children: [
                 SizedBox(height: 15,),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                    child: Text('Infos Book', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),textAlign: TextAlign.start,)
+                ),
+                SizedBox(height: 15,),
                 TitleBook,
                 SizedBox(height: 15,),
                 authorName,
@@ -238,8 +305,76 @@ class _BookShopState extends State<BookShop> {
                 SizedBox(height: 15,),
                 PriceBook,
                 SizedBox(height: 15,),
+                Condition,
+                SizedBox(height: 15,),
                 Description,
-                SizedBox(height: 0,),
+                SizedBox(height: 25,),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text('Add Images', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),),
+                      Text('5 images max', style: TextStyle(fontSize: 10, color: Colors.grey.shade700),),
+                      SizedBox(height: 15,),
+                      Row(
+                        children: [
+                          Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                          ),
+                          SizedBox(width: 5,),
+                          Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                          ),
+                          SizedBox(width: 5,),
+                          Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                          ),
+                          SizedBox(width: 5,),
+                          Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Center(child: Icon(LineAwesomeIcons.plus, color: Colors.grey.shade600,)),
+                          ),
+                          SizedBox(width: 5,),
+
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 25,),
+                SubmitButton,
+                SizedBox(height: 25,),
+
+
               ],
             ),
           ),
