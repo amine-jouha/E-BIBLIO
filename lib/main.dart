@@ -10,12 +10,16 @@ import 'package:ebiblio/getStarted/getStarted.dart';
 // import 'package:ebiblio/leftMenu/Login.dart';
 
 import 'getStarted/first_choice.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
 import 'pages/welcome.dart';
 
 
 Future<void> main() async {
   // ClassBuilder.registerClasses();
   WidgetsFlutterBinding.ensureInitialized();
+  initializeDateFormatting();
+
   await Firebase.initializeApp(
     // options: FirebaseOptions(
     //     apiKey: 'XijEUSw9BopmwHtllC4M3W8z0',

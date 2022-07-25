@@ -1,13 +1,19 @@
+
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/MorePages/bookInfos.dart';
 import 'package:ebiblio/model/Book_model.dart';
 import 'package:ebiblio/model/bookModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 import '../model/userInfo_model.dart';
+import '../model/user_model.dart';
 
 class BookShop extends StatefulWidget {
   const BookShop({Key? key}) : super(key: key);
@@ -18,6 +24,31 @@ class BookShop extends StatefulWidget {
 
 class _BookShopState extends State<BookShop> {
   User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance.collection('users').doc(user!.uid).get().then((value) {
+      this.loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
+
+  Future<Widget> _getImageFB(BuildContext context, String imageName) async {
+    late Image image;
+    await FireStorageService.loadImage(context, imageName).then((value) => {
+      image = Image.network(
+        value.toString(),
+        fit: BoxFit.cover,
+        height: 60,
+        width: 60,
+      ),
+    });
+    return image;
+  }
+
+
 
   //notre form key
   final _formKey = GlobalKey<FormState>();
@@ -37,6 +68,34 @@ class _BookShopState extends State<BookShop> {
     "Damaged",
   ];
 
+
+
+
+
+  ImagePicker image = ImagePicker();
+  String url = '';
+  File? file;
+  getImage() async {
+    var img = await image.pickImage(source: ImageSource.gallery);
+    setState(() {
+      file = File(img!.path);
+      // print(file);
+    });
+    uploadFile();
+  }
+
+  uploadFile() async {
+    var imageFile = FirebaseStorage.instance.ref().child('/${loggedInUser!.uid.toString()}');
+    UploadTask task = imageFile.putFile(file!);
+    TaskSnapshot snapshot = await task;
+    //for downloading
+    print('ici**********************************************');
+    url = await snapshot.ref.getDownloadURL();
+    print(url);
+    print('ici');
+    print(imageFile.name);
+  }
+
   @override
   Widget build(BuildContext context) {
     final TitleBook = TextFormField(
@@ -45,7 +104,7 @@ class _BookShopState extends State<BookShop> {
       controller: TitleEditingController,
       keyboardType: TextInputType.name,
       validator: (value) {
-        RegExp regex = new RegExp(r'^.{3}$');
+        RegExp regex = new RegExp(r'^.{3,}$');
         if(value!.isEmpty)
         {
           return ('Title connot be empty!');
@@ -78,12 +137,12 @@ class _BookShopState extends State<BookShop> {
       validator: (value)
       {
         if(value!.isEmpty) {
-          return ('Entrer votre Email');
+          return ('Enter Name Author');
         }
         //reg expression for email validation
-        if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value))
+        if(!RegExp(r'^.{3,}$').hasMatch(value))
         {
-          return ('Entrez un Email Valid!');
+          return ('Enter a Valid Name!');
         }
         return null;
       },
@@ -109,12 +168,12 @@ class _BookShopState extends State<BookShop> {
       validator: (value)
       {
         if(value!.isEmpty) {
-          return ('Entrer votre Email');
+          return ('Entrer date Book');
         }
         //reg expression for email validation
-        if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value))
+        if(!RegExp(r'^.{6,}$').hasMatch(value))
         {
-          return ('Entrez un Email Valid!');
+          return ('Enter a Valid Date!');
         }
         return null;
       },
@@ -143,7 +202,7 @@ class _BookShopState extends State<BookShop> {
           return ('Enter Number of Pages!');
         }
         //reg expression for email validation
-        if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value))
+        if(!RegExp(r'^\d+(,\d{1,2})?$').hasMatch(value))
         {
           return ('Enter a valid Number!');
         }
@@ -174,7 +233,7 @@ class _BookShopState extends State<BookShop> {
           return ('Enter a Price');
         }
         //reg expression for email validation
-        if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value))
+        if(!RegExp(r'^\d+(,\d{1,2})?$').hasMatch(value))
         {
           return ('Enter a valid Price!');
         }
@@ -337,6 +396,45 @@ class _BookShopState extends State<BookShop> {
                       SizedBox(height: 15,),
                       Row(
                         children: [
+                          FutureBuilder<Widget>(
+                            future: _getImageFB(context, '${loggedInUser.uid.toString()}'),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData)
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  print('le voici');
+                                  print(snapshot.data);
+                                  return
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: Container(
+                                        height: 30,
+                                        child: snapshot.data,
+                                      ),
+                                    );
+
+                                }
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Container(
+                                  child: CircleAvatar(
+                                      radius: 20,
+                                      backgroundImage: AssetImage(
+                                        'assets/avatar.png',
+                                      )
+
+                                  ),
+                                );
+                              }
+                              else return Container(
+                                child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: AssetImage(
+                                      'assets/avatar.png',
+                                    )
+
+                                ),
+                              );
+                            },
+                          ),
                           Container(
                             height: 60,
                             width: 60,
@@ -370,15 +468,20 @@ class _BookShopState extends State<BookShop> {
                             child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
                           ),
                           SizedBox(width: 5,),
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)
+                          GestureDetector(
+                            onTap: () async {
+                              await getImage();
+                            },
+                            child: Container(
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: Center(child: Icon(LineAwesomeIcons.plus, color: Colors.grey.shade600,)),
                             ),
-                            child: Center(child: Icon(LineAwesomeIcons.plus, color: Colors.grey.shade600,)),
                           ),
                           SizedBox(width: 5,),
 
@@ -405,6 +508,8 @@ class _BookShopState extends State<BookShop> {
 
     BookFormShop bookFormShop = BookFormShop();
 
+    if (_formKey.currentState!.validate()) {
+
     bookFormShop.uid = user!.uid;
     bookFormShop.title = title;
     bookFormShop.author = author;
@@ -418,10 +523,13 @@ class _BookShopState extends State<BookShop> {
 
 
 
-    await CircularProgressIndicator();
     Navigator.of(context).pop();
-    await firebaseFirestore.collection('BookFormShop').doc(user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
-    Fluttertoast.showToast(msg: 'Book Added successfully ${user!.displayName}');
+
+      await firebaseFirestore.collection('BookFormShop').doc(
+          user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
+      Fluttertoast.showToast(
+          msg: 'Book Added successfully ${user!.displayName}');
+    }
 
 
 
@@ -441,6 +549,15 @@ class _BookShopState extends State<BookShop> {
 
 
   }
+}
+
+//pour charger charger l'image qui est dans la base de donnée
+class FireStorageService extends ChangeNotifier {
+  FireStorageService();
+  static Future<dynamic> loadImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
+  }
+
 }
 
 
