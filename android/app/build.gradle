@@ -70,9 +70,9 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     implementation 'com.facebook.android:facebook-login:[8.1)'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
-    implementation 'com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta04'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.firebase:firebase-appcheck:16.0.0'
+    implementation 'com.google.firebase:firebase-appcheck-safetynet:16.0.0'
 
 }
 

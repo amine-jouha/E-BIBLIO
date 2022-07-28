@@ -20,6 +20,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting();
 
+
   await Firebase.initializeApp(
     // options: FirebaseOptions(
     //     apiKey: 'XijEUSw9BopmwHtllC4M3W8z0',

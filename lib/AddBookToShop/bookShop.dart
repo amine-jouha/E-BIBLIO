@@ -1,18 +1,15 @@
-
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ebiblio/MorePages/bookInfos.dart';
 import 'package:ebiblio/model/Book_model.dart';
-import 'package:ebiblio/model/bookModel.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:cross_file_image/cross_file_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-
-import '../model/userInfo_model.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import '../model/user_model.dart';
 
 class BookShop extends StatefulWidget {
@@ -35,19 +32,6 @@ class _BookShopState extends State<BookShop> {
     });
   }
 
-  Future<Widget> _getImageFB(BuildContext context, String imageName) async {
-    late Image image;
-    await FireStorageService.loadImage(context, imageName).then((value) => {
-      image = Image.network(
-        value.toString(),
-        fit: BoxFit.cover,
-        height: 60,
-        width: 60,
-      ),
-    });
-    return image;
-  }
-
 
 
   //notre form key
@@ -60,6 +44,7 @@ class _BookShopState extends State<BookShop> {
   final PageEditingController = new TextEditingController();
   final PriceEditingController = new TextEditingController();
   String? _currentSelectedValue;
+  bool isVisible = false;
 
   var _currencies = [
     "New",
@@ -68,36 +53,102 @@ class _BookShopState extends State<BookShop> {
     "Damaged",
   ];
 
+  // PlatformFile? pickedFile;
+  //
+  //
+  // Future selectFile() async{
+  //   final result = await FilePicker.platform.pickFiles();
+  //   if(result == null) return;
+  //
+  //   setState(() {
+  //     pickedFile = result.files.first;
+  //   });
+  //
+  // }
 
 
+  // List<Asset> images = <Asset>[];
+  // Asset? lastPic;
 
+  // Future<void> pickImages() async {
+  //   List<Asset> resultList = <Asset>[];
+  //   print('cest bon');
+  //
+  //   try {
+  //     resultList = await MultiImagePicker.pickImages(
+  //       maxImages: 5,
+  //       enableCamera: true,
+  //       selectedAssets: images,
+  //       materialOptions: MaterialOptions(
+  //         actionBarTitle: "e-Bilio Pick Images",
+  //       ),
+  //     );
+  //   } on Exception catch (e) {
+  //     print(e);
+  //   }
+  //
+  //
+  //   setState(() {
+  //     images = resultList;
+  //     if (images.length == 0) {
+  //       isVisible = false;
+  //     }
+  //
+  //   });
+  // }
 
-  ImagePicker image = ImagePicker();
-  String url = '';
-  File? file;
-  getImage() async {
-    var img = await image.pickImage(source: ImageSource.gallery);
-    setState(() {
-      file = File(img!.path);
-      // print(file);
-    });
-    uploadFile();
+  List<XFile> selectedImages = [];
+  // FirebaseStorage storage = FirebaseStorage.instance;
+  // Reference storageRef = FirebaseStorage.instance.ref();
+  List<String> imgURL = [];
+
+  Future<void> pickImages() async {
+    final pickedFileList = await ImagePicker().pickMultiImage();
+    if (pickedFileList != null) {
+      setState(() {
+        selectedImages = pickedFileList;
+        if (selectedImages.length == 0) {
+          isVisible = false;
+        }
+      });
+    }
   }
 
-  uploadFile() async {
-    var imageFile = FirebaseStorage.instance.ref().child('/${loggedInUser!.uid.toString()}');
-    UploadTask task = imageFile.putFile(file!);
-    TaskSnapshot snapshot = await task;
-    //for downloading
-    print('ici**********************************************');
-    url = await snapshot.ref.getDownloadURL();
-    print(url);
-    print('ici');
-    print(imageFile.name);
+  // uploadFile() async {
+  //   var imageFile = FirebaseStorage.instance.ref().child('/${loggedInUser.uid.toString()}');
+  //   UploadTask task = imageFile.putFile(file!);
+  //   TaskSnapshot snapshot = await task;
+  //   //for downloading
+  //   url = await snapshot.ref.getDownloadURL();
+  //   print(url);
+  //   print('ici');
+  //   print(imageFile.name);
+  // }
+  //
+  var url ='';
+
+  Future<void> uploadSelectedImages() async {
+    for (var i = 0; i < selectedImages.length; i++) {
+      final ref = FirebaseStorage.instance.ref().child('book/$i${loggedInUser.uid.toString()}');
+
+      // await ref.putFile(File(selectedImages[i].path));
+      UploadTask task = ref.putFile(File(selectedImages[i].path));
+      TaskSnapshot snapshot = await task;
+      url = await snapshot.ref.getDownloadURL();
+      print(url);
+    }
   }
+
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
+
     final TitleBook = TextFormField(
       // style: TextStyle(height: 0.5),
       autofocus: false,
@@ -352,6 +403,24 @@ class _BookShopState extends State<BookShop> {
         ),
       ),
     );
+    final TestButton = Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(10),
+      color: Colors.brown,
+      child: MaterialButton(
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () async{
+          await uploadSelectedImages();
+        },
+        child: Text(
+          'test',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -396,83 +465,107 @@ class _BookShopState extends State<BookShop> {
                       SizedBox(height: 15,),
                       Row(
                         children: [
-                          FutureBuilder<Widget>(
-                            future: _getImageFB(context, '${loggedInUser.uid.toString()}'),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData)
-                                if (snapshot.connectionState == ConnectionState.done) {
-                                  print('le voici');
-                                  print(snapshot.data);
-                                  return
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: Container(
-                                        height: 30,
-                                        child: snapshot.data,
-                                      ),
-                                    );
-
-                                }
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Container(
-                                  child: CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: AssetImage(
-                                        'assets/avatar.png',
-                                      )
-
-                                  ),
-                                );
-                              }
-                              else return Container(
-                                child: CircleAvatar(
-                                    radius: 20,
-                                    backgroundImage: AssetImage(
-                                      'assets/avatar.png',
-                                    )
-
-                                ),
-                              );
-                            },
-                          ),
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                          ),
-                          SizedBox(width: 5,),
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                          ),
-                          SizedBox(width: 5,),
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                          ),
-                          SizedBox(width: 5,),
-                          GestureDetector(
-                            onTap: () async {
-                              await getImage();
-                            },
+                          // Container(
+                          //   height: 60,
+                          //   width: 60,
+                          //   decoration: BoxDecoration(
+                          //       border: Border.all(color: Colors.grey),
+                          //       color: Colors.white,
+                          //       borderRadius: BorderRadius.circular(10)
+                          //   ),
+                          //   child: pickedFile != null
+                          //         ? ClipRRect(
+                          //           borderRadius: BorderRadius.circular(10),
+                          //           child: Image.file(
+                          //                 File(pickedFile!.path!),
+                          //                 fit: BoxFit.cover,
+                          //               ),
+                          //                     )
+                          //         : Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                          // ),
+                          // SizedBox(width: 5,),
+                          // Container(
+                          //   height: 60,
+                          //   width: 60,
+                          //   decoration: BoxDecoration(
+                          //       border: Border.all(color: Colors.grey),
+                          //       color: Colors.white,
+                          //       borderRadius: BorderRadius.circular(10)
+                          //   ),
+                          //   child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                          // ),
+                          // SizedBox(width: 5,),
+                          // Container(
+                          //   height: 60,
+                          //   width: 60,
+                          //   decoration: BoxDecoration(
+                          //       border: Border.all(color: Colors.grey),
+                          //       color: Colors.white,
+                          //       borderRadius: BorderRadius.circular(10)
+                          //   ),
+                          //   child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                          // ),
+                          Visibility(
+                            visible: isVisible,
                             child: Container(
+                              height: 80,
+                              width: 260,
+                              child: ListView.builder(
+                                  itemCount: selectedImages.length,
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder: (BuildContext context, int index) {
+                                     final asset = selectedImages[index];
+                                    print('***********');
+                                    print(asset);
+                                        return Row(
+                                          children: [
+                                            Container(
+                                                  height: 60,
+                                                  width: 60,
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(color: Colors.grey),
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(10)
+                                                  ),
+                                                  child: selectedImages != []
+                                                         ? ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              // child: AssetThumb(asset: asset, width: 60, height: 60, )
+                                                              child: Image(image: XFileImage(asset), fit: BoxFit.fill,),
+                                                         )
+                                                         : Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                                              ),
+                                            SizedBox(width: 5,)
+                                          ],
+                                        );
+                                  }
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              pickImages();
+
+                              setState(() {
+                                isVisible = true;
+                              });
+                            },
+                            child: selectedImages.length == 5
+                            ? Container(
+                                height: 60,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                child:  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    // child: AssetThumb(asset: selectedImages[4], width: 60, height: 60, )
+                                    child: Image(image: XFileImage(selectedImages[4]), fit: BoxFit.fill,)
+                                )
+                            )
+                            : Container(
                               height: 60,
                               width: 60,
                               decoration: BoxDecoration(
@@ -493,8 +586,8 @@ class _BookShopState extends State<BookShop> {
                 SizedBox(height: 25,),
                 SubmitButton,
                 SizedBox(height: 25,),
-
-
+                TestButton,
+                SizedBox(height: 25,),
               ],
             ),
           ),
@@ -502,13 +595,13 @@ class _BookShopState extends State<BookShop> {
       )
     );
   }
-  AddBookToShop(
-      String title,String author,String numPage,String dateBook,String price,String condition,String description) async {
+  AddBookToShop(String title,String author,String numPage,String dateBook,String price,String condition,String description) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     BookFormShop bookFormShop = BookFormShop();
-
+    uploadSelectedImages();
     if (_formKey.currentState!.validate()) {
+
 
     bookFormShop.uid = user!.uid;
     bookFormShop.title = title;
@@ -523,6 +616,7 @@ class _BookShopState extends State<BookShop> {
 
 
 
+
     Navigator.of(context).pop();
 
       await firebaseFirestore.collection('BookFormShop').doc(
@@ -532,32 +626,8 @@ class _BookShopState extends State<BookShop> {
     }
 
 
-
-
-
-    // FirebaseFirestore.instance.collection('UserInfo').doc();
-    //  final bookModel = UserInfos(
-    //    uid : user!.uid,
-    //    ville : ville,
-    //    type : type
-    //  );
-    // await _auth.createUserWithEmailAndPassword(email: email, password: password)
-    //     .then((value) => {postDetailsToFirestore()})
-    //     .catchError((e) {
-    //   Fluttertoast.showToast(msg: e!.message);
-    // });
-
-
   }
 }
 
-//pour charger charger l'image qui est dans la base de donnée
-class FireStorageService extends ChangeNotifier {
-  FireStorageService();
-  static Future<dynamic> loadImage(BuildContext context, String image) async {
-    return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
-  }
-
-}
 
 

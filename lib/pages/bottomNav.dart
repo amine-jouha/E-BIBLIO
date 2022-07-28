@@ -108,7 +108,7 @@ class _BottomNavState extends State<BottomNav> {
             // ? NetworkImage(user!.photoURL!)
             ? CachedNetworkImageProvider(user!.photoURL!)
             // ? CachedNetworkImageProvider('https://i.pinimg.com/originals/2f/11/d8/2f11d875e68791e2d29279cbff699a03.png')
-            : AssetImage('assets/avatar3.png') as ImageProvider,
+            : AssetImage('assets/avatar6.png') as ImageProvider,
         // AssetImage('assets/avatar3.png'),
         // NetworkImage(user!.photoURL!),
       ),
