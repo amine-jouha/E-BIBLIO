@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/model/Book_model.dart';
+import 'package:ebiblio/providers/addBook_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cross_file_image/cross_file_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +10,8 @@ import'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:provider/provider.dart';
+import '../model/userInfo_model.dart';
 import '../model/user_model.dart';
 
 class BookShop extends StatefulWidget {
@@ -22,6 +24,8 @@ class BookShop extends StatefulWidget {
 class _BookShopState extends State<BookShop> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
+  UserInfos userInfos = UserInfos();
+  addBookProvider? _addBookPro;
 
   @override
   void initState() {
@@ -30,7 +34,12 @@ class _BookShopState extends State<BookShop> {
       this.loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
     });
+
+    _addBookPro = Provider.of<addBookProvider>(context, listen: false);
+    _addBookPro!.num;
   }
+
+
 
 
 
@@ -128,8 +137,9 @@ class _BookShopState extends State<BookShop> {
   var url ='';
 
   Future<void> uploadSelectedImages() async {
+
     for (var i = 0; i < selectedImages.length; i++) {
-      final ref = FirebaseStorage.instance.ref().child('book/$i${loggedInUser.uid.toString()}');
+      final ref = FirebaseStorage.instance.ref().child('book${loggedInUser.uid.toString()}/book${userInfos.bookInShop}/$i${loggedInUser.userName.toString()}');
 
       // await ref.putFile(File(selectedImages[i].path));
       UploadTask task = ref.putFile(File(selectedImages[i].path));
@@ -137,6 +147,8 @@ class _BookShopState extends State<BookShop> {
       url = await snapshot.ref.getDownloadURL();
       print(url);
     }
+    userInfos.bookInShop = (userInfos.bookInShop! + 1);
+
   }
 
 
@@ -403,24 +415,6 @@ class _BookShopState extends State<BookShop> {
         ),
       ),
     );
-    final TestButton = Material(
-      elevation: 2,
-      borderRadius: BorderRadius.circular(10),
-      color: Colors.brown,
-      child: MaterialButton(
-        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () async{
-          await uploadSelectedImages();
-        },
-        child: Text(
-          'test',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
 
     return Scaffold(
       appBar: AppBar(
@@ -586,8 +580,6 @@ class _BookShopState extends State<BookShop> {
                 SizedBox(height: 25,),
                 SubmitButton,
                 SizedBox(height: 25,),
-                TestButton,
-                SizedBox(height: 25,),
               ],
             ),
           ),
@@ -599,7 +591,6 @@ class _BookShopState extends State<BookShop> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     BookFormShop bookFormShop = BookFormShop();
-    uploadSelectedImages();
     if (_formKey.currentState!.validate()) {
 
 
@@ -612,6 +603,8 @@ class _BookShopState extends State<BookShop> {
     bookFormShop.condition = condition;
     bookFormShop.description = description;
 
+    uploadSelectedImages();
+
 
 
 
@@ -622,7 +615,7 @@ class _BookShopState extends State<BookShop> {
       await firebaseFirestore.collection('BookFormShop').doc(
           user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
       Fluttertoast.showToast(
-          msg: 'Book Added successfully ${user!.displayName}');
+          msg: 'Book Added successfully ${user!.displayName ?? loggedInUser.userName}');
     }
 
 

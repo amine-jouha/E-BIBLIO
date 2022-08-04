@@ -1,3 +1,4 @@
+import 'package:ebiblio/providers/addBook_provider.dart';
 import 'package:ebiblio/providers/home_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LoginController()),
+        ChangeNotifierProvider(create: (context) => addBookProvider()),
         ChangeNotifierProvider(create: (context) => HomeProvider())
       ],
       child: MaterialApp(

@@ -224,6 +224,7 @@ class _MyDialogState extends State<MyDialog> {
     userInfos.ville = ville;
     userInfos.type = type;
     userInfos.upgraded = false;
+    userInfos.bookInShop = 0;
 
     await CircularProgressIndicator();
     Navigator.of(context).pop();

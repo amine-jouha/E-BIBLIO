@@ -5,8 +5,9 @@ class UserInfos {
   String? ville;
   List? type;
   bool? upgraded;
+  int? bookInShop;
 
-  UserInfos({this.uid, this.ville, this.type, this.upgraded});
+  UserInfos({this.uid, this.ville, this.type, this.upgraded, this.bookInShop});
 
   //receiving data from server
   factory UserInfos.fromMap(map) {
@@ -15,6 +16,7 @@ class UserInfos {
       ville: map['ville'],
       type: map['type'],
       upgraded: map['upgraded'],
+      bookInShop: map['bookInShop'],
 
     );
   }
@@ -27,6 +29,7 @@ class UserInfos {
       'ville': ville,
       'type': type,
       'upgraded': upgraded,
+      'bookInShop': bookInShop,
 
     };
   }
@@ -37,6 +40,7 @@ class UserInfos {
     ville = json['ville'];
     type = json['type'];
     upgraded = json['upgraded'];
+    bookInShop = json['bookInShop'];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -44,6 +48,7 @@ class UserInfos {
     data['ville'] = this.ville;
     data['type'] = this.type;
     data['upgraded'] = this.upgraded;
+    data['bookInShop'] = this.bookInShop;
 
     return data;
   }
