@@ -34,6 +34,17 @@ class _BookShopState extends State<BookShop> {
       this.loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
     });
+    FirebaseFirestore.instance.collection('UserInfo').doc(user!.uid).get().then((value) {
+      this.userInfos = UserInfos.fromMap(value.data());
+      setState(() {});
+    });
+
+    // FirebaseFirestore.instance.collection('UserInfo').doc(user!.uid).get().then((value) {
+    //   userInfos.bookInShop;
+    //   setState(() {});
+    // });
+
+    userInfos.bookInShop;
 
     _addBookPro = Provider.of<addBookProvider>(context, listen: false);
     _addBookPro!.num;
@@ -137,9 +148,13 @@ class _BookShopState extends State<BookShop> {
   var url ='';
 
   Future<void> uploadSelectedImages() async {
+    print("--------------------------------");
+    print(userInfos.bookInShop!);
+    print("--------------------------------");
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     for (var i = 0; i < selectedImages.length; i++) {
-      final ref = FirebaseStorage.instance.ref().child('book${loggedInUser.uid.toString()}/book${userInfos.bookInShop}/$i${loggedInUser.userName.toString()}');
+      final ref = FirebaseStorage.instance.ref().child('book${loggedInUser.uid.toString()}/book${userInfos.bookInShop!.toString()}/$i${loggedInUser.userName.toString()}');
 
       // await ref.putFile(File(selectedImages[i].path));
       UploadTask task = ref.putFile(File(selectedImages[i].path));
@@ -147,7 +162,13 @@ class _BookShopState extends State<BookShop> {
       url = await snapshot.ref.getDownloadURL();
       print(url);
     }
-    userInfos.bookInShop = (userInfos.bookInShop! + 1);
+
+    await firebaseFirestore.collection('UserInfo').doc(user!.uid).update({"bookInShop" : userInfos.bookInShop! + 1}).then((value)
+    => print("successfuly updated! bro"),
+        onError: (e) => print('Error Updating Document $e')
+    );
+    // userInfos.bookInShop = (userInfos.bookInShop!) + 1;
+    print(userInfos.bookInShop);
 
   }
 
@@ -615,7 +636,7 @@ class _BookShopState extends State<BookShop> {
       await firebaseFirestore.collection('BookFormShop').doc(
           user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
       Fluttertoast.showToast(
-          msg: 'Book Added successfully ${user!.displayName ?? loggedInUser.userName}');
+          msg: 'Book Added successfully ${user!.displayName ?? loggedInUser.userName}, wait for 5min');
     }
 
 

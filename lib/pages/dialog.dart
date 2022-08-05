@@ -226,6 +226,11 @@ class _MyDialogState extends State<MyDialog> {
     userInfos.upgraded = false;
     userInfos.bookInShop = 0;
 
+    // await firebaseFirestore.collection('UserInfo').doc(user!.uid).set({"bookInShop" : 0}).then((value)
+    // => print("successfuly updated! bro"),
+    //     onError: (e) => print('Error Updating Document $e')
+    // );
+
     await CircularProgressIndicator();
     Navigator.of(context).pop();
     await firebaseFirestore.collection('UserInfo').doc(user!.uid).set(userInfos.toMap());

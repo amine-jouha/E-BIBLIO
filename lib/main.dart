@@ -32,6 +32,13 @@ Future<void> main() async {
   // await FirebaseAppCheck.instance.activate(
   //   webRecaptchaSiteKey: 'recaptcha-v3-site-key',
   // );
+  // DevicePreview(
+  //     enabled: true,
+  //     tools: [
+  //       ...DevicePreview.defaultTools
+  //     ],
+  //     builder: (context) =>  MyApp()
+  // )
   runApp(const MyApp());
 }
 

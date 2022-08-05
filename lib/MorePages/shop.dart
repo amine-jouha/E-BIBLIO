@@ -128,8 +128,8 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
                           image: onFictif[index].imageBook,
                           title: onFictif[index].title,
-                          tag: 'tagg0Image$index',
                           author: onFictif[index].name,
+                          tag: 'r$index',
                         )));
                       },
                       child: Row(
@@ -145,7 +145,6 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                 // color:Colors.pink,
                                 child: Column(
                                   children: [
-
                                     ClipRRect(
                                       borderRadius:BorderRadius.circular(10),
                                       child: Container(
@@ -161,7 +160,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
                                                     child: Hero(
-                                                        tag: 'tagg0Image$index',
+                                                        tag: 'r$index',
                                                         child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
                                                     )
                                                 ),
@@ -590,7 +589,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
                           image: onMoFictif[index].imageBook,
                           title: onMoFictif[index].title,
-                          tag: 'tagg0Image$index',
+                          tag: 'j$index',
                           author: onMoFictif[index].name,
                         )));
                       },
@@ -623,7 +622,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
                                                     child: Hero(
-                                                        tag: 'tagg0Image$index',
+                                                        tag: 'j$index',
                                                         child: Image.asset(onMoFictif[index].imageBook, fit: BoxFit.cover,)
                                                     )
                                                 ),
@@ -785,7 +784,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
                           image: onDecFictif[index].imageBook,
                           title: onDecFictif[index].title,
-                          tag: 'tagg0Image$index',
+                          tag: 'x$index',
                           author: onDecFictif[index].name,
                         )));
                       },
@@ -818,7 +817,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
                                                     child: Hero(
-                                                        tag: 'tagg0Image$index',
+                                                        tag: 'x$index',
                                                         child: Image.asset(onDecFictif[index].imageBook, fit: BoxFit.cover,)
                                                     )
                                                 ),
