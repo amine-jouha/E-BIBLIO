@@ -1,16 +1,24 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/MorePages/info_popular.dart';
 import 'package:ebiblio/data_fictif/decFictif.dart';
 import 'package:ebiblio/data_fictif/moFictif.dart';
 import 'package:ebiblio/exten.dart';
+import 'package:ebiblio/model/Book_model.dart';
+import 'package:ebiblio/model/bookModel.dart';
+import 'package:ebiblio/pages_slider/list.dart';
 import 'package:ebiblio/providers/home_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../data_fictif/kiFictif.dart';
+import '../model/userInfo_model.dart';
+import '../model/user_model.dart';
 import '../pages/data_recomm.dart';
 import 'bookInfos.dart';
 
@@ -21,23 +29,56 @@ class ShopEbiblio extends StatefulWidget {
   State<ShopEbiblio> createState() => _ShopEbiblioState();
 }
 
+Future<Widget> _getImageFB(BuildContext context, String imageName) async {
+  late Image image;
+  await FireStorageService.loadImage(context, imageName).then((value) => {
+    image = Image.network(
+      value.toString(),
+      fit: BoxFit.cover,
+      height: 142,
+      width: 130,
+    ),
+  });
+  return image;
+}
+
 class _ShopEbiblioState extends State<ShopEbiblio> {
   final controller = TextEditingController();
   List<Fictif> pdItems = onFictif;
   double sizeW = 180;
+  double sizeX = 160;
   HomeProvider? _provider;
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser = UserModel();
+  UserInfos userInfos = UserInfos();
+  BookFormShop bookFormInfo = BookFormShop();
 
   @override
   void initState() {
     super.initState();
     // _provider!.books;
-    _provider = Provider.of<HomeProvider>(context, listen: false);
-    _provider!.query;
-    _provider?.getBooks();
-
+    FirebaseFirestore.instance.collection('users').doc(user!.uid).get().then((value) {
+      this.loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+    FirebaseFirestore.instance.collection('UserInfo').doc(user!.uid).get().then((value) {
+      this.userInfos = UserInfos.fromMap(value.data());
+      setState(() {});
+    });
+    FirebaseFirestore.instance.collection('BookFormShop').doc(user!.uid).get().then((value) {
+      this.bookFormInfo = BookFormShop.fromMap(value.data());
+      setState(() {});
+    });
+    // _provider = Provider.of<HomeProvider>(context, listen: false);
+    // _provider!.query;
+    // _provider?.getBooks();
 
 
   }
+
+
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -79,14 +120,223 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
               width: MediaQuery.of(context).size.width,
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Text('Activities', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
+                child: Text('Your Books', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
               ),
             ),
+            SizedBox(height: 10,),
             Container(
-              height: 200,
+              height: 250,
               width: MediaQuery.of(context).size.width,
              //recent books you have read
-             child: SvgPicture.asset('assets/svg/nothing.svg',),
+             child: userInfos.bookInShop != null && userInfos.bookInShop != 0
+                ? SizedBox(
+                   height: 300,
+                   child: ListView.builder(
+                       itemCount: userInfos.bookInShop,
+                       scrollDirection: Axis.horizontal,
+                       itemBuilder: (BuildContext context, int index) {
+                         return InkWell(
+                           onTap: () {
+                             Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
+                               image: onFictif[index].imageBook,
+                               title: onFictif[index].title,
+                               author: onFictif[index].name,
+                               tag: 'r$index',
+                             )));
+                           },
+                           child: Row(
+                             children: [
+                               SizedBox(width: 5,),
+                               Row(
+                                 children: [
+                                   // SizedBox(width: 5,),
+                                   Container(
+                                     // height: 200,
+                                     // width: MediaQuery.of(context).size.width/2.9,
+                                     width: 120,
+                                     // color:Colors.pink,
+                                     child: Column(
+                                       children: [
+                                         ClipRRect(
+                                           borderRadius:BorderRadius.circular(10),
+                                           child: Container(
+                                             height: sizeX,
+                                             child: Stack(
+                                               fit: StackFit.expand,
+                                               children: [
+                                                 Opacity(opacity:0.5, child:
+                                                  FutureBuilder<Widget>(
+                                                   future: _getImageFB(context, 'book${loggedInUser.uid.toString()}/book${index}/0${loggedInUser.userName.toString()}'),
+                                                   builder: (context, snapshot) {
+                                                     if (snapshot.hasData)
+                                                       if (snapshot.connectionState == ConnectionState.done) {
+                                                         print('le voici');
+                                                         print(snapshot.data);
+                                                         return
+                                                           Container(
+                                                             height: 60,
+                                                             child: snapshot.data ?? Image.asset('assets/cover2.jpg', fit: BoxFit.cover,),
+                                                           );
+
+                                                       }
+                                                     if (snapshot.connectionState == ConnectionState.waiting) {
+                                                       return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                     }
+                                                     else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                   },
+                                                 ),
+                                                 ),
+                                                 BackdropFilter(
+                                                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                   child: Padding(
+                                                     padding: const EdgeInsets.all(10.0),
+                                                     child: ClipRRect(
+                                                         borderRadius:BorderRadius.circular(7),
+                                                         child: Hero(
+                                                             tag: 'r$index',
+                                                             child: FutureBuilder<Widget>(
+                                                               future: _getImageFB(context, 'book${loggedInUser.uid.toString()}/book${index}/0${loggedInUser.userName.toString()}'),
+                                                               builder: (context, snapshot) {
+                                                                 if (snapshot.hasData)
+                                                                   if (snapshot.connectionState == ConnectionState.done) {
+                                                                     print('le voici');
+                                                                     print(snapshot.data);
+                                                                     return
+                                                                       Container(
+                                                                         height: 60,
+                                                                         child: snapshot.data,
+                                                                       );
+
+                                                                   }
+                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                   return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                                 }
+                                                                 else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                               },
+                                                             ),
+                                                             // Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
+                                                         )
+                                                     ),
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ),
+                                         ),
+                                         // ClipRRect(
+                                         //   borderRadius:BorderRadius.circular(10),
+                                         //   child: Container(
+                                         //       height: 260,
+                                         //       width: MediaQuery.of(context).size.width/2,
+                                         //       child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,
+                                         //       )),
+                                         // ),
+                                         SizedBox(height: 10,),
+                                         Padding(
+                                           padding: const EdgeInsets.all(10.0),
+                                           child: Column(
+                                             children: [
+                                               // Text(
+                                               //   'Yes${bookFormInfo.title}  Went LikeGoing To My Home When Like How Mike So My Brother'.toTitleCase(),
+                                               //
+                                               //   style: TextStyle(
+                                               //       fontWeight: FontWeight.bold,
+                                               //       fontFamily: "Inter",
+                                               //       color: Colors.black.withOpacity(0.8),
+                                               //       fontSize: 12.5
+                                               //   ),
+                                               //   maxLines: 2,
+                                               //   overflow:TextOverflow.ellipsis,
+                                               // ),
+                                               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                                 stream: FirebaseFirestore.instance.collection('BookFormShop').snapshots(),
+                                                 builder: (_, snapshot) {
+                                                   if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+
+                                                   if (snapshot.hasData) {
+                                                     final docs = snapshot.data!.docs;
+                                                     final data = docs[index].data();
+                                                     return Text(data['title']);
+                                                     // return ListView.builder(
+                                                     //   itemCount: docs.length,
+                                                     //   itemBuilder: (_, i) {
+                                                     //     final data = docs[i].data();
+                                                     //     return ListTile(
+                                                     //       title: Text(data['title']),
+                                                     //       subtitle: Text(data['price']),
+                                                     //     );
+                                                     //   },
+                                                     // );
+                                                   }
+
+                                                   return Center(child: CircularProgressIndicator());
+                                                 },
+                                               ),
+                                               SizedBox(height: 5,),
+                                               // Container(
+                                               //   width: sizeW,
+                                               //   child: Row(
+                                               //     // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                               //
+                                               //     children: [
+                                               //       CircleAvatar(
+                                               //         radius: 10,
+                                               //         backgroundImage: AssetImage(onFictif[index].imageProfil),
+                                               //       ),
+                                               //       SizedBox(width: 5,),
+                                               //       Container(
+                                               //         // color: Colors.blue,
+                                               //           width: sizeW/2,
+                                               //           child: Text(onFictif[index].name, style: TextStyle(fontSize: 12),overflow: TextOverflow.ellipsis,)
+                                               //       )
+                                               //     ],
+                                               //   ),
+                                               // ),
+                                               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                                 stream: FirebaseFirestore.instance.collection('BookFormShop').snapshots(),
+                                                 builder: (_, snapshot) {
+                                                   if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+
+                                                   if (snapshot.hasData) {
+                                                     final docs = snapshot.data!.docs;
+                                                     final data = docs[index].data();
+                                                     return Container(
+                                                       width: sizeW,
+                                                       child: Text("${data['price']}\$", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                     );
+                                                     // return ListView.builder(
+                                                     //   itemCount: docs.length,
+                                                     //   itemBuilder: (_, i) {
+                                                     //     final data = docs[i].data();
+                                                     //     return ListTile(
+                                                     //       title: Text(data['title']),
+                                                     //       subtitle: Text(data['price']),
+                                                     //     );
+                                                     //   },
+                                                     // );
+                                                   }
+
+                                                   return Center(child: CircularProgressIndicator());
+                                                 },
+                                               ),
+
+                                             ],
+                                           ),
+                                         ),
+
+                                       ],
+                                     ),
+                                   ),
+                                   // SizedBox(width: 15,),
+                                 ],
+                               ),
+                               SizedBox(width: 5,)
+                             ],
+                           ),
+                         );
+                       }
+                   ),)
+                : SvgPicture.asset('assets/svg/nothing.svg',),
             ),
             SizedBox(height: 10,),
             SizedBox(
@@ -902,4 +1152,12 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
     });
 
   }
+}
+
+class FireStorageService extends ChangeNotifier {
+  FireStorageService();
+  static Future<dynamic> loadImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
+  }
+
 }
