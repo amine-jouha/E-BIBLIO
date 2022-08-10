@@ -57,6 +57,7 @@ dependencies:
 #  flutter_absolute_path: ^1.0.6
   cross_file_image: ^1.0.0
   device_preview: ^1.1.0
+  firebase_database: ^9.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

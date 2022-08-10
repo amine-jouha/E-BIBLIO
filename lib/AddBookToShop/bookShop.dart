@@ -631,10 +631,16 @@ class _BookShopState extends State<BookShop> {
 
 
 
+
+
     Navigator.of(context).pop();
 
-      await firebaseFirestore.collection('BookFormShop').doc(
-          user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
+      // await firebaseFirestore.collection('BookFormShop').doc(
+      //     user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
+
+    await firebaseFirestore.collection('BookFormShop').doc(
+        user!.uid + userInfos.bookInShop.toString()).set(bookFormShop.toMap());
+
       Fluttertoast.showToast(
           msg: 'Book Added successfully ${user!.displayName ?? loggedInUser.userName}, wait for 5min');
     }

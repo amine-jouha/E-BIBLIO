@@ -113,7 +113,7 @@ class _BookInfosState extends State<BookInfos> {
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
-        title: Text('book of the street'.toTitleCase()),
+        title: Text('${widget.title}'.toTitleCase()) ,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/MorePages/info_popular.dart';
 import 'package:ebiblio/data_fictif/decFictif.dart';
@@ -20,6 +21,7 @@ import '../data_fictif/kiFictif.dart';
 import '../model/userInfo_model.dart';
 import '../model/user_model.dart';
 import '../pages/data_recomm.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'bookInfos.dart';
 
 class ShopEbiblio extends StatefulWidget {
@@ -29,15 +31,17 @@ class ShopEbiblio extends StatefulWidget {
   State<ShopEbiblio> createState() => _ShopEbiblioState();
 }
 
+
 Future<Widget> _getImageFB(BuildContext context, String imageName) async {
-  late Image image;
+   var image;
   await FireStorageService.loadImage(context, imageName).then((value) => {
-    image = Image.network(
-      value.toString(),
+    image = CachedNetworkImage(
+      imageUrl: value.toString(),
       fit: BoxFit.cover,
       height: 142,
       width: 130,
     ),
+
   });
   return image;
 }
@@ -52,6 +56,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
   UserModel loggedInUser = UserModel();
   UserInfos userInfos = UserInfos();
   BookFormShop bookFormInfo = BookFormShop();
+
 
   @override
   void initState() {
@@ -68,11 +73,12 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
     FirebaseFirestore.instance.collection('BookFormShop').doc(user!.uid).get().then((value) {
       this.bookFormInfo = BookFormShop.fromMap(value.data());
       setState(() {});
-    });
+
+
     // _provider = Provider.of<HomeProvider>(context, listen: false);
     // _provider!.query;
     // _provider?.getBooks();
-
+  });
 
   }
 
@@ -81,7 +87,10 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
 
   @override
   Widget build(BuildContext context) {
-
+    _provider = Provider.of<HomeProvider>(context, listen: false);
+    List _title = [];
+    var _image;
+    var _author;
     return Scaffold(
       appBar: AppBar(
           title: Text("E-biblio Shop", style: TextStyle(color: Colors.grey.shade800),),
@@ -135,11 +144,21 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                        itemCount: userInfos.bookInShop,
                        scrollDirection: Axis.horizontal,
                        itemBuilder: (BuildContext context, int index) {
+                          Future<BookFormShop?> readBook() async{
+                            // final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+(userInfos.bookInShop!-1).toString()}');
+                            final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+index.toString()}');
+                            final snapshot = await docUser.get();
+                            if(snapshot.exists) {
+                              return BookFormShop.fromJson(snapshot.data()!);
+                            }
+                            return null;
+                          };
+
                          return InkWell(
                            onTap: () {
                              Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
                                image: onFictif[index].imageBook,
-                               title: onFictif[index].title,
+                               title: _title[index],
                                author: onFictif[index].name,
                                tag: 'r$index',
                              )));
@@ -223,102 +242,56 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                              ),
                                            ),
                                          ),
-                                         // ClipRRect(
-                                         //   borderRadius:BorderRadius.circular(10),
-                                         //   child: Container(
-                                         //       height: 260,
-                                         //       width: MediaQuery.of(context).size.width/2,
-                                         //       child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,
-                                         //       )),
-                                         // ),
                                          SizedBox(height: 10,),
                                          Padding(
                                            padding: const EdgeInsets.all(10.0),
                                            child: Column(
                                              children: [
-                                               // Text(
-                                               //   'Yes${bookFormInfo.title}  Went LikeGoing To My Home When Like How Mike So My Brother'.toTitleCase(),
-                                               //
-                                               //   style: TextStyle(
-                                               //       fontWeight: FontWeight.bold,
-                                               //       fontFamily: "Inter",
-                                               //       color: Colors.black.withOpacity(0.8),
-                                               //       fontSize: 12.5
-                                               //   ),
-                                               //   maxLines: 2,
-                                               //   overflow:TextOverflow.ellipsis,
-                                               // ),
-                                               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                                                 stream: FirebaseFirestore.instance.collection('BookFormShop').snapshots(),
-                                                 builder: (_, snapshot) {
-                                                   if (snapshot.hasError) return Text('Error = ${snapshot.error}');
 
-                                                   if (snapshot.hasData) {
-                                                     final docs = snapshot.data!.docs;
-                                                     final data = docs[index].data();
-                                                     return Text(data['title']);
-                                                     // return ListView.builder(
-                                                     //   itemCount: docs.length,
-                                                     //   itemBuilder: (_, i) {
-                                                     //     final data = docs[i].data();
-                                                     //     return ListTile(
-                                                     //       title: Text(data['title']),
-                                                     //       subtitle: Text(data['price']),
-                                                     //     );
-                                                     //   },
-                                                     // );
+                                               FutureBuilder<BookFormShop?>(
+                                                   future: readBook(),
+                                                   builder: (context, snapshot) {
+                                                     if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+                                                         if (snapshot.hasData) {
+                                                           final userBook = snapshot.data;
+                                                           _title.add(userBook!.title);
+                                                           return Text(
+                                                                 userBook.title!.toTitleCase(),
+                                                                 style: TextStyle(
+                                                                     fontWeight: FontWeight.bold,
+                                                                     fontFamily: "Inter",
+                                                                     color: Colors.black.withOpacity(0.8),
+                                                                     fontSize: 12.5
+                                                                 ),
+                                                                 maxLines: 2,
+                                                                 overflow:TextOverflow.ellipsis,
+                                                           );
+                                                         }
+                                                     return Center(child: CircularProgressIndicator());
+
+
                                                    }
-
-                                                   return Center(child: CircularProgressIndicator());
-                                                 },
                                                ),
+
                                                SizedBox(height: 5,),
-                                               // Container(
-                                               //   width: sizeW,
-                                               //   child: Row(
-                                               //     // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                               //
-                                               //     children: [
-                                               //       CircleAvatar(
-                                               //         radius: 10,
-                                               //         backgroundImage: AssetImage(onFictif[index].imageProfil),
-                                               //       ),
-                                               //       SizedBox(width: 5,),
-                                               //       Container(
-                                               //         // color: Colors.blue,
-                                               //           width: sizeW/2,
-                                               //           child: Text(onFictif[index].name, style: TextStyle(fontSize: 12),overflow: TextOverflow.ellipsis,)
-                                               //       )
-                                               //     ],
-                                               //   ),
-                                               // ),
-                                               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                                                 stream: FirebaseFirestore.instance.collection('BookFormShop').snapshots(),
-                                                 builder: (_, snapshot) {
-                                                   if (snapshot.hasError) return Text('Error = ${snapshot.error}');
 
-                                                   if (snapshot.hasData) {
-                                                     final docs = snapshot.data!.docs;
-                                                     final data = docs[index].data();
-                                                     return Container(
-                                                       width: sizeW,
-                                                       child: Text("${data['price']}\$", style: TextStyle(fontWeight: FontWeight.bold),),
-                                                     );
-                                                     // return ListView.builder(
-                                                     //   itemCount: docs.length,
-                                                     //   itemBuilder: (_, i) {
-                                                     //     final data = docs[i].data();
-                                                     //     return ListTile(
-                                                     //       title: Text(data['title']),
-                                                     //       subtitle: Text(data['price']),
-                                                     //     );
-                                                     //   },
-                                                     // );
+                                               FutureBuilder<BookFormShop?>(
+                                                   future: readBook(),
+                                                   builder: (context, snapshot) {
+                                                     if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+
+                                                     if (snapshot.hasData) {
+                                                       final userBook = snapshot.data;
+                                                       return userBook == null
+                                                           ? Text('yes its null')
+                                                           : Text("${userBook.price!}\$", style: TextStyle(fontWeight: FontWeight.bold),);
+                                                     }
+                                                     return Center(child: CircularProgressIndicator());
+
+
                                                    }
-
-                                                   return Center(child: CircularProgressIndicator());
-                                                 },
                                                ),
+
 
                                              ],
                                            ),
@@ -350,6 +323,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                     Consumer<HomeProvider>(
                       builder: (context, provideeer, widget)=>GestureDetector(
                           onTap: () {
+
                             setState(() {
                               _provider!.books = [];
                               print(provideeer.query);
@@ -443,6 +417,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                             maxLines: 2,
                                             overflow:TextOverflow.ellipsis,
                                           ),
+
                                           SizedBox(height: 10,),
                                           // Container(
                                           //   width: sizeW,
