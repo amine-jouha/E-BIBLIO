@@ -109,8 +109,7 @@ class _BottomNavState extends State<BottomNav> {
             ? CachedNetworkImageProvider(user!.photoURL!)
             // ? CachedNetworkImageProvider('https://i.pinimg.com/originals/2f/11/d8/2f11d875e68791e2d29279cbff699a03.png')
             : AssetImage('assets/avatar6.png') as ImageProvider,
-        // AssetImage('assets/avatar3.png'),
-        // NetworkImage(user!.photoURL!),
+
       ),
       otherAccountsPictures: [
         IconButton(icon:Icon(Icons.logout), color: Colors.white, onPressed: () {
@@ -134,13 +133,7 @@ class _BottomNavState extends State<BottomNav> {
           leading: Icon(LineAwesomeIcons.store),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context)=> ShopEbiblio()));
-            // setState(() {
-            //   Ondialogue();
-            //   print('rien nest gratuit');
-            // });
-            // setState(() {
-            //   setStateIfMounted(openDialog);
-            // });
+
           },
         ),
         ListTile(

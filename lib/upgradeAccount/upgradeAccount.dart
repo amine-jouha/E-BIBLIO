@@ -104,10 +104,10 @@ class _UpgradeAccountState extends State<UpgradeAccount> {
                           style: TextStyle(
                             fontSize: 18, color: Colors.white, )),
                       padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                      minWidth: 180,
+                      minWidth: MediaQuery.of(context).size.width /2 -40,
                     ),
                   ),
-                  SizedBox(width: 10,),
+                  // SizedBox(width: 10,),
                   Material(
                     color:Colors.brown,
                     borderRadius: BorderRadius.circular(5),
@@ -129,7 +129,7 @@ class _UpgradeAccountState extends State<UpgradeAccount> {
                           style: TextStyle(
                             fontSize: 18, color: Colors.white, )),
                       padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                      minWidth: 180,
+                      minWidth: MediaQuery.of(context).size.width /2 -40,
                     ),
                   ),
 

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/pages/bottomNav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -102,10 +103,10 @@ class _BackToOLdState extends State<BackToOLd> {
                           style: TextStyle(
                             fontSize: 18, color: Colors.white, )),
                       padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                      minWidth: 180,
+                      minWidth: MediaQuery.of(context).size.width /2 -40,
                     ),
                   ),
-                  SizedBox(width: 10,),
+                  // SizedBox(width: 10,),
                   Material(
                     color:Colors.brown,
                     borderRadius: BorderRadius.circular(5),
@@ -122,12 +123,14 @@ class _BackToOLdState extends State<BackToOLd> {
                         //change icon and title
                         //si possible: l'accès au camera pour agora
                       },
-                      child: Text('Accept Terms',
+                      child: AutoSizeText(
+                        'Accept Terms',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18, color: Colors.white, )),
+                            fontSize: 18, color: Colors.white, )
+                      ),
                       padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                      minWidth: 180,
+                      minWidth: MediaQuery.of(context).size.width /2 -40,
                     ),
                   ),
 

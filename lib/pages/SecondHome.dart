@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/MorePages/bookInfos.dart';
 import 'package:ebiblio/exten.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -14,9 +15,12 @@ import 'package:ebiblio/pages/data_recomm.dart';
 import 'package:ebiblio/pages/dialog.dart';
 import 'package:ebiblio/pages/more_recommended.dart';
 import 'package:ebiblio/upgradeAccount/upgradeAccount.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../auth_users/Login.dart';
 import '../controllers/google_signin_controller.dart';
+import '../dynamic_Link/dynamicLink.dart';
+import '../dynamic_Link/page_test.dart';
 import '../model/user_model.dart';
 import '../style_key.dart';
 
@@ -35,10 +39,45 @@ class _SecondHomeState extends State<SecondHome> {
   UserInfos userInfos = UserInfos();
   int _current = 0;
   double sizeW = 180;
+  String url='';
+
+  ///Retreive dynamic link firebase.
+  void initDynamicLinks() async {
+    final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
+    final Uri? deepLink = data?.link;
+
+    ////
+    String link = 'https://revivefrr.page.link/6RQi';
+    final PendingDynamicLinkData? _initialLink = await FirebaseDynamicLinks.instance.getDynamicLink(Uri.parse(link));
+
+    if (deepLink != null) {
+      handleDynamicLink(deepLink);
+    }
+    FirebaseDynamicLinks.instance.onLink;
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+      Navigator.pushNamed(context, dynamicLinkData.link.path);
+    }).onError((error) {
+      // Handle errors
+    });
+  }
+
+  handleDynamicLink(Uri url) {
+    List<String> separatedString = [];
+    separatedString.addAll(url.path.split('/'));
+    if (separatedString[1] == "post") {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PageTest(separatedString[2])));
+    }
+  }
+
+
 
   @override
   void initState() {
     super.initState();
+    initDynamicLinks();
     FirebaseFirestore.instance.collection('users').doc(user!.uid).get().then((value) {
       this.loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
@@ -138,8 +177,6 @@ class _SecondHomeState extends State<SecondHome> {
               ))
       );
     }
-    // Amine n'oublie pas de modifié ça psk c'est lah ihsen la3wan ce que t'as fais là mon gars
-    // c'est bon c fait :)
     Future.delayed(Duration(seconds: 4), () {
       if (userInfos.ville == null) {
         if (justone == false) {
@@ -169,36 +206,10 @@ class _SecondHomeState extends State<SecondHome> {
         return shouldPop ?? false;
       },
       child: Scaffold(
-        // drawerEnableOpenDragGesture: true,
-        // drawerEdgeDragWidth: 50,
-        // appBar: AppBar(
-        //   elevation: 0,
-        //   iconTheme: IconThemeData(color: Colors.black),
-        //   backgroundColor: Colors.transparent,
-        //   leading: IconButton(
-        //     icon: Icon(LineAwesomeIcons.bars),
-        //     onPressed: () {
-        //
-        //     },
-        //   ),
-        //   // title:
-        //   // Icon(LineAwesomeIcons.bars, color: Colors.black),
-        //   // IconButton(icon: Icon(LineAwesomeIcons.bars, color:Colors.black ,), onPressed: () {  },),
-        //   actions: [
-        //     IconButton(icon: Icon(LineAwesomeIcons.user,color: Colors.black,), onPressed: () {},),
-        //   ],),
-        // drawer: Drawer(
-        //   child:
-        //   drawerItems,
-        //   backgroundColor: Colors.black87,
-        // ),
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(
             children: [
-              // ElevatedButton(onPressed:() {
-              //   openDialog();
-              //    } ,
-              //     child: Text('click')),
               SizedBox(
                 height: 10,
               ),
@@ -892,7 +903,21 @@ class _SecondHomeState extends State<SecondHome> {
 
 
                 ],
-              )
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      url = await AppUtils.buildDynamicLink();
+                    } catch (e) {
+                      print(e);
+                    }
+                    setState(() {});
+                    await Share.share('Check out my website for more Infos \n $url');
+                  },
+                  child: Text(
+                    "Generate Dynamic Link",
+                    style: TextStyle(fontSize: 20),
+                  )),
             ],
           ),
         ),

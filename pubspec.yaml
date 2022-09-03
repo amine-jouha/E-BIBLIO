@@ -64,6 +64,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   firebase_app_check: ^0.0.6+7
+  firebase_dynamic_links: ^4.3.5
+  auto_size_text: ^3.0.0
+  shimmer: ^2.0.0
 
 dev_dependencies:
   flutter_test:

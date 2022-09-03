@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ebiblio/MorePages/detailsBook.dart';
 import 'package:ebiblio/MorePages/info_popular.dart';
 import 'package:ebiblio/data_fictif/decFictif.dart';
 import 'package:ebiblio/data_fictif/moFictif.dart';
@@ -17,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../data_fictif/kiFictif.dart';
 import '../model/userInfo_model.dart';
 import '../model/user_model.dart';
@@ -33,7 +35,7 @@ class ShopEbiblio extends StatefulWidget {
 
 
 Future<Widget> _getImageFB(BuildContext context, String imageName) async {
-   var image;
+  var image;
   await FireStorageService.loadImage(context, imageName).then((value) => {
     image = CachedNetworkImage(
       imageUrl: value.toString(),
@@ -56,6 +58,12 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
   UserModel loggedInUser = UserModel();
   UserInfos userInfos = UserInfos();
   BookFormShop bookFormInfo = BookFormShop();
+  List _title = [];
+  List _author = [];
+  List _image = [];
+  List _nums = [];
+  List _description = [];
+
 
 
   @override
@@ -75,10 +83,11 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
       setState(() {});
 
 
-    // _provider = Provider.of<HomeProvider>(context, listen: false);
-    // _provider!.query;
-    // _provider?.getBooks();
-  });
+
+      // _provider = Provider.of<HomeProvider>(context, listen: false);
+      // _provider!.query;
+      // _provider?.getBooks();
+    });
 
   }
 
@@ -88,13 +97,11 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
   @override
   Widget build(BuildContext context) {
     _provider = Provider.of<HomeProvider>(context, listen: false);
-    List _title = [];
-    var _image;
-    var _author;
+
     return Scaffold(
       appBar: AppBar(
-          title: Text("E-biblio Shop", style: TextStyle(color: Colors.grey.shade800),),
-          elevation: 0,
+        title: Text("E-biblio Shop", style: TextStyle(color: Colors.grey.shade800),),
+        elevation: 0,
         centerTitle: true,
         backgroundColor: Colors.transparent,
         leading: IconButton(
@@ -136,180 +143,196 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
             Container(
               height: 250,
               width: MediaQuery.of(context).size.width,
-             //recent books you have read
-             child: userInfos.bookInShop != null && userInfos.bookInShop != 0
-                ? SizedBox(
-                   height: 300,
-                   child: ListView.builder(
-                       itemCount: userInfos.bookInShop,
-                       scrollDirection: Axis.horizontal,
-                       itemBuilder: (BuildContext context, int index) {
-                          Future<BookFormShop?> readBook() async{
-                            // final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+(userInfos.bookInShop!-1).toString()}');
-                            final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+index.toString()}');
-                            final snapshot = await docUser.get();
-                            if(snapshot.exists) {
-                              return BookFormShop.fromJson(snapshot.data()!);
-                            }
-                            return null;
-                          };
+              //your Book
+              child: userInfos.bookInShop != null && userInfos.bookInShop != 0
+                      ? SizedBox(
+                          height: 300,
+                          child: ListView.builder(
+                            itemCount: userInfos.bookInShop,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (BuildContext context, int index) {
+                              readBook() async{
+                                // final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+(userInfos.bookInShop!-1).toString()}');
+                                final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+index.toString()}');
+                                final snapshot = await docUser.get();
+                                if(snapshot.exists) {
+                                  return BookFormShop.fromJson(snapshot.data()!);
+                                }
+                                return null;
+                              };
 
-                         return InkWell(
-                           onTap: () {
-                             Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
-                               image: onFictif[index].imageBook,
-                               title: _title[index],
-                               author: onFictif[index].name,
-                               tag: 'r$index',
-                             )));
-                           },
-                           child: Row(
-                             children: [
-                               SizedBox(width: 5,),
-                               Row(
-                                 children: [
-                                   // SizedBox(width: 5,),
-                                   Container(
-                                     // height: 200,
-                                     // width: MediaQuery.of(context).size.width/2.9,
-                                     width: 120,
-                                     // color:Colors.pink,
-                                     child: Column(
-                                       children: [
-                                         ClipRRect(
-                                           borderRadius:BorderRadius.circular(10),
-                                           child: Container(
-                                             height: sizeX,
-                                             child: Stack(
-                                               fit: StackFit.expand,
-                                               children: [
-                                                 Opacity(opacity:0.5, child:
-                                                  FutureBuilder<Widget>(
-                                                   future: _getImageFB(context, 'book${loggedInUser.uid.toString()}/book${index}/0${loggedInUser.userName.toString()}'),
-                                                   builder: (context, snapshot) {
-                                                     if (snapshot.hasData)
-                                                       if (snapshot.connectionState == ConnectionState.done) {
-                                                         print('le voici');
-                                                         print(snapshot.data);
-                                                         return
-                                                           Container(
-                                                             height: 60,
-                                                             child: snapshot.data ?? Image.asset('assets/cover2.jpg', fit: BoxFit.cover,),
-                                                           );
+                              return InkWell(
+                                  onTap: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsBook(
+                                      image: _image[index],
+                                      title: _title[index],
+                                      author: _author[index],
+                                      description: _description[index],
+                                      tag: 'r$index',
+                                    )));
+                                  },
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 5,),
+                                      Container(
+                                        width: 120,
+                                        child: Column(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:BorderRadius.circular(10),
+                                              child: Container(
+                                                height: sizeX,
+                                                child: Stack(
+                                                  fit: StackFit.expand,
+                                                  children: [
+                                                    Opacity(
+                                                      opacity:0.5,
+                                                      child: FutureBuilder<Widget?>(
+                                                        future: _getImageFB(context, 'book${loggedInUser.uid.toString()}/book${index}/0${loggedInUser.userName.toString()}'),
+                                                        builder: (context, snapshot) {
+                                                          // Future.delayed(Duration(seconds: 4), () {
+                                                          //   _image.add(snapshot.data);
+                                                          //   print(_image);
+                                                          //   print('this is image');
+                                                          // });
+                                                          // _image.add(snapshot.data);
 
-                                                       }
-                                                     if (snapshot.connectionState == ConnectionState.waiting) {
-                                                       return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
-                                                     }
-                                                     else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
-                                                   },
-                                                 ),
-                                                 ),
-                                                 BackdropFilter(
-                                                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                                   child: Padding(
-                                                     padding: const EdgeInsets.all(10.0),
-                                                     child: ClipRRect(
-                                                         borderRadius:BorderRadius.circular(7),
-                                                         child: Hero(
-                                                             tag: 'r$index',
-                                                             child: FutureBuilder<Widget>(
-                                                               future: _getImageFB(context, 'book${loggedInUser.uid.toString()}/book${index}/0${loggedInUser.userName.toString()}'),
-                                                               builder: (context, snapshot) {
-                                                                 if (snapshot.hasData)
-                                                                   if (snapshot.connectionState == ConnectionState.done) {
-                                                                     print('le voici');
-                                                                     print(snapshot.data);
-                                                                     return
-                                                                       Container(
-                                                                         height: 60,
-                                                                         child: snapshot.data,
-                                                                       );
+                                                          // print(_image);
+                                                          print('here isssss $index');
+                                                          if (snapshot.hasData)
+                                                            if (snapshot.connectionState == ConnectionState.done) {
+                                                              _image.add(snapshot.data);
+                                                              print(_image);
+                                                              print(index);
+                                                              return
+                                                                Container(
+                                                                  height: 60,
+                                                                  child: snapshot.data ?? Image.asset('assets/cover2.jpg', fit: BoxFit.cover,),
+                                                                );
+                                                            }
+                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                            return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                          }
+                                                          else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                        },
+                                                      ),
 
-                                                                   }
-                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                   return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
-                                                                 }
-                                                                 else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
-                                                               },
-                                                             ),
-                                                             // Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
-                                                         )
-                                                     ),
-                                                   ),
-                                                 ),
-                                               ],
-                                             ),
-                                           ),
-                                         ),
-                                         SizedBox(height: 10,),
-                                         Padding(
-                                           padding: const EdgeInsets.all(10.0),
-                                           child: Column(
-                                             children: [
+                                                    ),
+                                                    BackdropFilter(
+                                                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(10.0),
+                                                        child: ClipRRect(
+                                                            borderRadius:BorderRadius.circular(7),
+                                                            child: FutureBuilder<Widget>(
+                                                              future: _getImageFB(context, 'book${loggedInUser.uid.toString()}/book${index}/0${loggedInUser.userName.toString()}'),
+                                                              builder: (context, snapshot) {
+                                                                if (snapshot.hasData)
+                                                                  if (snapshot.connectionState == ConnectionState.done) {
+                                                                    return
+                                                                      Container(
+                                                                        height: 60,
+                                                                        child: snapshot.data,
+                                                                      );
+                                                                  }
+                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                  return Shimmer.fromColors(
+                                                                      baseColor: Colors.black12,
+                                                                      highlightColor: Colors.white,
+                                                                      loop: 3,
+                                                                      child: Image.asset('assets/cover2.jpg', fit: BoxFit.cover,));
+                                                                }
+                                                                else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
+                                                              },
+                                                            )
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Padding(
+                                              padding: const EdgeInsets.all(10.0),
+                                              child: Column(
+                                                children: [
+                                                  FutureBuilder<BookFormShop?>(
+                                                      future: readBook(),
+                                                      builder: (context, snapshot) {
+                                                        if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+                                                        if (snapshot.hasData) {
+                                                          final userBook = snapshot.data;
+                                                          _title.add(userBook!.title);
+                                                          _author.add(userBook.author);
+                                                          _description.add(userBook.description);
+                                                          print(_title);
 
-                                               FutureBuilder<BookFormShop?>(
-                                                   future: readBook(),
-                                                   builder: (context, snapshot) {
-                                                     if (snapshot.hasError) return Text('Error = ${snapshot.error}');
-                                                         if (snapshot.hasData) {
-                                                           final userBook = snapshot.data;
-                                                           _title.add(userBook!.title);
-                                                           return Text(
-                                                                 userBook.title!.toTitleCase(),
-                                                                 style: TextStyle(
-                                                                     fontWeight: FontWeight.bold,
-                                                                     fontFamily: "Inter",
-                                                                     color: Colors.black.withOpacity(0.8),
-                                                                     fontSize: 12.5
-                                                                 ),
-                                                                 maxLines: 2,
-                                                                 overflow:TextOverflow.ellipsis,
-                                                           );
-                                                         }
-                                                     return Center(child: CircularProgressIndicator());
-
-
-                                                   }
-                                               ),
-
-                                               SizedBox(height: 5,),
-
-                                               FutureBuilder<BookFormShop?>(
-                                                   future: readBook(),
-                                                   builder: (context, snapshot) {
-                                                     if (snapshot.hasError) return Text('Error = ${snapshot.error}');
-
-                                                     if (snapshot.hasData) {
-                                                       final userBook = snapshot.data;
-                                                       return userBook == null
-                                                           ? Text('yes its null')
-                                                           : Text("${userBook.price!}\$", style: TextStyle(fontWeight: FontWeight.bold),);
-                                                     }
-                                                     return Center(child: CircularProgressIndicator());
+                                                          return Text(
+                                                            userBook.title!.toTitleCase(),
+                                                            style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                fontFamily: "Inter",
+                                                                color: Colors.black.withOpacity(0.8),
+                                                                fontSize: 12.5
+                                                            ),
+                                                            maxLines: 1,
+                                                            overflow:TextOverflow.ellipsis,
+                                                          );
+                                                        }
+                                                        return Center(child: Shimmer.fromColors(
+                                                          baseColor: Colors.black12,
+                                                          highlightColor: Colors.white,
+                                                          loop: 3,
+                                                          child: Container(
+                                                            height: 10,
+                                                            width: 50,
+                                                          ),
+                                                        ));
 
 
-                                                   }
-                                               ),
+                                                      }
+                                                  ),
+                                                  SizedBox(height: 5,),
+                                                  FutureBuilder<BookFormShop?>(
+                                                      future: readBook(),
+                                                      builder: (context, snapshot) {
+                                                        if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+                                                        if (snapshot.hasData) {
+                                                          final userBook = snapshot.data;
+                                                          return userBook == null
+                                                              ? Text('no Price')
+                                                              : Text("${userBook.price!}\$", style: TextStyle(fontWeight: FontWeight.bold),);
+                                                        }
+                                                        return Center(child: Shimmer.fromColors(
+                                                          baseColor: Colors.black12,
+                                                          highlightColor: Colors.white,
+                                                          loop: 3,
+                                                          child: Container(
+                                                            height: 10,
+                                                            width: 50,
+                                                          ),
+                                                        ));
 
 
-                                             ],
-                                           ),
-                                         ),
+                                                      }
+                                                  ),
 
-                                       ],
-                                     ),
-                                   ),
-                                   // SizedBox(width: 15,),
-                                 ],
-                               ),
-                               SizedBox(width: 5,)
-                             ],
-                           ),
-                         );
-                       }
-                   ),)
-                : SvgPicture.asset('assets/svg/nothing.svg',),
+
+                                                ],
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 5,)
+                                    ],
+                                  ),
+                      );
+                    }
+                ),)
+                      : SvgPicture.asset('assets/svg/nothing.svg',),
             ),
             SizedBox(height: 10,),
             SizedBox(
@@ -383,10 +406,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 padding: const EdgeInsets.all(10.0),
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
-                                                    child: Hero(
-                                                        tag: 'r$index',
-                                                        child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
-                                                    )
+                                                    child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
                                                 ),
                                               ),
                                             ),
@@ -412,32 +432,14 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 fontWeight: FontWeight.bold,
                                                 fontFamily: "Inter",
                                                 color: Colors.black.withOpacity(0.8),
-                                              fontSize: 12.5
+                                                fontSize: 12.5
                                             ),
                                             maxLines: 2,
                                             overflow:TextOverflow.ellipsis,
                                           ),
 
                                           SizedBox(height: 10,),
-                                          // Container(
-                                          //   width: sizeW,
-                                          //   child: Row(
-                                          //     // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                          //
-                                          //     children: [
-                                          //       CircleAvatar(
-                                          //         radius: 10,
-                                          //         backgroundImage: AssetImage(onFictif[index].imageProfil),
-                                          //       ),
-                                          //       SizedBox(width: 5,),
-                                          //       Container(
-                                          //         // color: Colors.blue,
-                                          //           width: sizeW/2,
-                                          //           child: Text(onFictif[index].name, style: TextStyle(fontSize: 12),overflow: TextOverflow.ellipsis,)
-                                          //       )
-                                          //     ],
-                                          //   ),
-                                          // ),
+
                                           Container(
                                             width: sizeW,
                                             child: Text('\$25.00', style: TextStyle(fontWeight: FontWeight.bold),),
@@ -476,167 +478,164 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
             SizedBox(
               height: 240,
               child: ListView.builder(
-                itemCount: onFictif.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8.0,),
-                    child: Card(
-                      child: Container(
-                        // height: 260,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/raw5.jpg'),
-                              fit: BoxFit.cover,
-                              colorFilter: new ColorFilter.mode(
-                                  Colors.white.withOpacity(0.3), BlendMode.dstATop),
-                            )
-                        ),
-                        width: MediaQuery.of(context).size.width - 35,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5.0),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage: AssetImage(onFictif[index].imageProfil),
-                                  ),
-                                  SizedBox(width: 10,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        child: Text(onFictif[index].name),
-                                      ),
-                                      Container(
-                                        child: Text('Agadir', style: TextStyle(fontSize: 9, color: Colors.grey.shade500) ,),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                  itemCount: onFictif.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 8.0,),
+                      child: Card(
+                        child: Container(
+                          // height: 260,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage('assets/raw5.jpg'),
+                                fit: BoxFit.cover,
+                                colorFilter: new ColorFilter.mode(
+                                    Colors.white.withOpacity(0.3), BlendMode.dstATop),
+                              )
+                          ),
+                          width: MediaQuery.of(context).size.width - 35,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 5.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: AssetImage(onFictif[index].imageProfil),
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          child: Text(onFictif[index].name),
+                                        ),
+                                        Container(
+                                          child: Text('Agadir', style: TextStyle(fontSize: 9, color: Colors.grey.shade500) ,),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 5,),
-                            Container(
-                              width:MediaQuery.of(context).size.width - 50,
-                              child: Text('im a seller of book, sometime i have my book and sometime i sell book of others'
-                                  'so if you check my account'
-                                  .toTitleCase(), textAlign: TextAlign.justify, overflow: TextOverflow.ellipsis, maxLines: 2,style: TextStyle(
-                                fontSize: 11, color: Colors.grey.shade700
-                              ),),
-                            ),
-                            SizedBox(height: 5,),
-                            SizedBox(
-                              height: 150,
-                              child: ListView.builder(
-                                  itemCount: onFictif.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return InkWell(
-                                      onTap: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
-                                          image: onFictif[index].imageBook,
-                                          title: onFictif[index].title,
-                                          tag: 't$index',
-                                          author: onFictif[index].name,
-                                        )));
-                                      },
-                                      child: Row(
-                                        children: [
-                                          // SizedBox(width: 5,),
-                                          Row(
-                                            children: [
-                                              // SizedBox(width: 5,),
-                                              Container(
-                                                // height: 200,
-                                                // width: MediaQuery.of(context).size.width/2.9,
-                                                width: 80,
-                                                // color:Colors.pink,
-                                                child: Column(
-                                                  children: [
+                              SizedBox(height: 5,),
+                              Container(
+                                width:MediaQuery.of(context).size.width - 50,
+                                child: Text('im a seller of book, sometime i have my book and sometime i sell book of others'
+                                    'so if you check my account'
+                                    .toTitleCase(), textAlign: TextAlign.justify, overflow: TextOverflow.ellipsis, maxLines: 2,style: TextStyle(
+                                    fontSize: 11, color: Colors.grey.shade700
+                                ),),
+                              ),
+                              SizedBox(height: 5,),
+                              SizedBox(
+                                height: 150,
+                                child: ListView.builder(
+                                    itemCount: onFictif.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => BookInfos(
+                                            image: onFictif[index].imageBook,
+                                            title: onFictif[index].title,
+                                            tag: 't$index',
+                                            author: onFictif[index].name,
+                                          )));
+                                        },
+                                        child: Row(
+                                          children: [
+                                            // SizedBox(width: 5,),
+                                            Row(
+                                              children: [
+                                                // SizedBox(width: 5,),
+                                                Container(
+                                                  // height: 200,
+                                                  // width: MediaQuery.of(context).size.width/2.9,
+                                                  width: 80,
+                                                  // color:Colors.pink,
+                                                  child: Column(
+                                                    children: [
 
-                                                    ClipRRect(
-                                                      borderRadius:BorderRadius.circular(10),
-                                                      child: Container(
-                                                        height: 110,
-                                                        child: Stack(
-                                                          fit: StackFit.expand,
-                                                          children: [
-                                                            // Opacity(opacity:0.5,child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)),
-                                                            Padding(
-                                                              padding: const EdgeInsets.all(5.0),
-                                                              child: ClipRRect(
-                                                                  borderRadius:BorderRadius.circular(7),
-                                                                  child: Hero(
-                                                                      tag: 't$index',
-                                                                      child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
-                                                                  )
+                                                      ClipRRect(
+                                                        borderRadius:BorderRadius.circular(10),
+                                                        child: Container(
+                                                          height: 110,
+                                                          child: Stack(
+                                                            fit: StackFit.expand,
+                                                            children: [
+                                                              // Opacity(opacity:0.5,child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)),
+                                                              Padding(
+                                                                padding: const EdgeInsets.all(5.0),
+                                                                child: ClipRRect(
+                                                                    borderRadius:BorderRadius.circular(7),
+                                                                    child: Image.asset(onFictif[index].imageBook, fit: BoxFit.cover,)
+                                                                ),
                                                               ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                        child: Column(
+                                                          children: [
+                                                            Text('Yes Went Like Going To My Home When Like How Mike So My Brother'.toTitleCase(),
+                                                              style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontFamily: "Inter",
+                                                                  color: Colors.black.withOpacity(0.8),
+                                                                  fontSize: 9
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:TextOverflow.ellipsis,
                                                             ),
+                                                            // Container(
+                                                            //   width: sizeW,
+                                                            //   child: Row(
+                                                            //     // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                            //
+                                                            //     children: [
+                                                            //       CircleAvatar(
+                                                            //         radius: 10,
+                                                            //         backgroundImage: AssetImage(onFictif[index].imageProfil),
+                                                            //       ),
+                                                            //       SizedBox(width: 5,),
+                                                            //       Container(
+                                                            //         // color: Colors.blue,
+                                                            //           width: sizeW/2,
+                                                            //           child: Text(onFictif[index].name, style: TextStyle(fontSize: 12),overflow: TextOverflow.ellipsis,)
+                                                            //       )
+                                                            //     ],
+                                                            //   ),
+                                                            // ),
+                                                            // Container(
+                                                            //   width: sizeW,
+                                                            //   child: Text('\$25.00', style: TextStyle(fontWeight: FontWeight.bold),),
+                                                            // )
                                                           ],
                                                         ),
                                                       ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                      child: Column(
-                                                        children: [
-                                                          Text('Yes Went Like Going To My Home When Like How Mike So My Brother'.toTitleCase(),
-                                                            style: TextStyle(
-                                                                fontWeight: FontWeight.bold,
-                                                                fontFamily: "Inter",
-                                                                color: Colors.black.withOpacity(0.8),
-                                                                fontSize: 9
-                                                            ),
-                                                            maxLines: 2,
-                                                            overflow:TextOverflow.ellipsis,
-                                                          ),
-                                                          // Container(
-                                                          //   width: sizeW,
-                                                          //   child: Row(
-                                                          //     // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                          //
-                                                          //     children: [
-                                                          //       CircleAvatar(
-                                                          //         radius: 10,
-                                                          //         backgroundImage: AssetImage(onFictif[index].imageProfil),
-                                                          //       ),
-                                                          //       SizedBox(width: 5,),
-                                                          //       Container(
-                                                          //         // color: Colors.blue,
-                                                          //           width: sizeW/2,
-                                                          //           child: Text(onFictif[index].name, style: TextStyle(fontSize: 12),overflow: TextOverflow.ellipsis,)
-                                                          //       )
-                                                          //     ],
-                                                          //   ),
-                                                          // ),
-                                                          // Container(
-                                                          //   width: sizeW,
-                                                          //   child: Text('\$25.00', style: TextStyle(fontWeight: FontWeight.bold),),
-                                                          // )
-                                                        ],
-                                                      ),
-                                                    ),
 
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              // SizedBox(width: 15,),
-                                            ],
-                                          ),
-                                          // SizedBox(width: 5,)
-                                        ],
-                                      ),
-                                    );
-                                  }
-                              ),),
-                          ],
+                                                // SizedBox(width: 15,),
+                                              ],
+                                            ),
+                                            // SizedBox(width: 5,)
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                ),),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
               ),
             ),
             SizedBox(height: 40,),
@@ -650,17 +649,17 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                     Text('Classic Books', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
                     Consumer<HomeProvider>(
                       builder: (context, provideeer, widget)=>GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _provider!.books = [];
-                            print(provideeer.query);
-                            provideeer.query = 'classic books';
-                            print(provideeer.query);
+                          onTap: () {
+                            setState(() {
+                              _provider!.books = [];
+                              print(provideeer.query);
+                              provideeer.query = 'classic books';
+                              print(provideeer.query);
 
-                          });
+                            });
 
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => InfoPopular()));
-                        },
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => InfoPopular()));
+                          },
                           child: Icon(Icons.keyboard_arrow_right)
                       ),
                     ),
@@ -712,10 +711,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 padding: const EdgeInsets.all(10.0),
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
-                                                    child: Hero(
-                                                        tag: 'tagg0Image$index',
-                                                        child: Image.asset(onKifictif[index].imageBook, fit: BoxFit.cover,)
-                                                    )
+                                                    child: Image.asset(onKifictif[index].imageBook, fit: BoxFit.cover,)
                                                 ),
                                               ),
                                             ),
@@ -846,10 +842,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 padding: const EdgeInsets.all(10.0),
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
-                                                    child: Hero(
-                                                        tag: 'j$index',
-                                                        child: Image.asset(onMoFictif[index].imageBook, fit: BoxFit.cover,)
-                                                    )
+                                                    child: Image.asset(onMoFictif[index].imageBook, fit: BoxFit.cover,)
                                                 ),
                                               ),
                                             ),
@@ -915,64 +908,64 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
               ),),
             SizedBox(height: 15,),
             SizedBox(
-              height: 150,
-              width: MediaQuery.of(context).size.width - 60,
-              child: Container(
+                height: 150,
+                width: MediaQuery.of(context).size.width - 60,
+                child: Container(
 
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.blue.shade50,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Container(
-                            width:120,
-                            // color: Colors.red,
-                            child: Text('stories that can interest you'.toTitleCase(),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.bold,
-                                fontFamily: 'Inter'
-                              ),
-                              // textAlign: TextAlign.justify,
-                            )
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.blue.shade50,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                                width:120,
+                                // color: Colors.red,
+                                child: Text('stories that can interest you'.toTitleCase(),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Inter'
+                                  ),
+                                  // textAlign: TextAlign.justify,
+                                )
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 5,),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(EdgeInsets.only(left: 30, right: 30)),
-                            elevation: MaterialStateProperty.all(0),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(color: Colors.black)
-                                  )
+                          SizedBox(height: 5,),
+                          ElevatedButton(
+                              style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(EdgeInsets.only(left: 30, right: 30)),
+                                  elevation: MaterialStateProperty.all(0),
+                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18.0),
+                                          side: BorderSide(color: Colors.black)
+                                      )
+                                  ),
+                                  backgroundColor: MaterialStateProperty.all(Colors.transparent)
                               ),
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent)
-                          ),
-                            onPressed: () {},
-                            child: Text('Discover', style: TextStyle(color: Colors.black),)
-                        )
-                      ],
-                    ),
-                    Container(
-                      // height: 150,
-                      width: 160,
-                      // color: Colors.blue,
-                      child: SvgPicture.asset('assets/svg/woman.svg',fit: BoxFit.cover,),
-                    )
-                  ],
-                ),
-              )
+                              onPressed: () {},
+                              child: Text('Discover', style: TextStyle(color: Colors.black),)
+                          )
+                        ],
+                      ),
+                      Container(
+                        // height: 150,
+                        width: 160,
+                        // color: Colors.blue,
+                        child: SvgPicture.asset('assets/svg/woman.svg',fit: BoxFit.cover,),
+                      )
+                    ],
+                  ),
+                )
             ),
             SizedBox(height: 25,),
             SizedBox(
@@ -1041,10 +1034,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                 padding: const EdgeInsets.all(10.0),
                                                 child: ClipRRect(
                                                     borderRadius:BorderRadius.circular(7),
-                                                    child: Hero(
-                                                        tag: 'x$index',
-                                                        child: Image.asset(onDecFictif[index].imageBook, fit: BoxFit.cover,)
-                                                    )
+                                                    child: Image.asset(onDecFictif[index].imageBook, fit: BoxFit.cover,)
                                                 ),
                                               ),
                                             ),

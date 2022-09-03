@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ebiblio/exten.dart';
 import 'package:ebiblio/pages/SecondHome.dart';
 import 'package:flutter/material.dart';
@@ -7,64 +8,33 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 import '../pages/bottomNav.dart';
 
-class PopBookInfos extends StatefulWidget {
-  const PopBookInfos({Key? key,
-    this.image,
-    this.title,
-    this.publishedDate,
-    this.author,
-    this.tag,
-    this.pageCount,
-    this.description,
-    this.averageRating,
-    this.subtitle
-  }) : super(key: key);
-
-  final image;
+class DetailsBook extends StatefulWidget {
+  const DetailsBook({Key? key, this.image, this.title, this.author, this.tag, this.description}) : super(key: key);
+  final CachedNetworkImage? image;
   final title;
-  final publishedDate;
-  final averageRating;
-  final pageCount;
-  final author;
   final description;
-  final subtitle;
+  final author;
   final tag;
 
   @override
-  State<PopBookInfos> createState() => _PopBookInfosState();
+  State<DetailsBook> createState() => _DetailsBookState();
 }
 
-class _PopBookInfosState extends State<PopBookInfos> {
-  String? _desc;
+class _DetailsBookState extends State<DetailsBook> {
   String? firstHalf;
   String? secondHalf;
-  final String description =
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do '
-      'eiusmod tempor incididunt ut labore et dolore magna aliqua. Bibendum neque'
-      ' egestas congue quisque egestas diam. Vulputate ut pharetra sit amet. Tortor'
-      ' id aliquet lectus proin nibh nisl. Pretium quam vulputate dignissim suspendisse.'
-      ' id aliquet lectus proin nibh nisl. Pretium quam vulputate dignissim suspendisse.'
-      ' id aliquet lectus proin nibh nisl. Pretium quam vulputate dignissim suspendisse.'
-      ' id aliquet lectus proin nibh nisl. Pretium quam vulputate dignissim suspendisse.'
-      ' id aliquet lectus proin nibh nisl. Pretium quam vulputate dignissim suspendisse.'
-      ' Dignissim cras tincidunt lobortis feugiat vivamus at augue. Justo nec ultrices dui'
-      ' Dignissim cras tincidunt lobortis feugiat vivamus at augue. Justo nec ultrices dui'
-      ' Dignissim cras tincidunt lobortis feugiat vivamus at augue. Justo nec ultrices dui'
-      ' sapien eget mi proin sed. Viverra maecenas accumsan lacus vel facilisis volutpat est'
-      ' velit. Cursus turpis massa tincidunt dui ut ornare. Libero id faucibus nisl tincidunt'
-      ' eget. Nullam ac tortor vitae purus.';
+
 
   bool flag = true;
   @override
   void initState() {
     super.initState();
-    _desc = widget.description ?? widget.subtitle ??'-';
 
-    if (_desc!.length > 550) {
-      firstHalf = _desc!.substring(0, 550);
-      secondHalf = _desc!.substring(550, _desc!.length);
+    if (widget.description.length > 550) {
+      firstHalf = widget.description.substring(0, 550);
+      secondHalf = widget.description.substring(550, widget.description.length);
     } else {
-      firstHalf = _desc;
+      firstHalf = widget.description;
       secondHalf = "";
     }
   }
@@ -80,11 +50,6 @@ class _PopBookInfosState extends State<PopBookInfos> {
           // crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Container(
-            //   color: Colors.grey.withOpacity(0.2),
-            //   height: 60,
-            //   child: Icon(Icons.bookmark),
-            // ),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: ElevatedButton(
@@ -115,24 +80,13 @@ class _PopBookInfosState extends State<PopBookInfos> {
                 ),
               ),
             ),
-            // Container(
-            //   height: 60,
-            //
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(10),
-            //     color: Colors.amber,
-            //   ),
-            //   child: Center(child: Text('Contact Seller', style: TextStyle(
-            //     fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white
-            //   ),)),
-            // ),
 
           ],
         ),
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+        title: Text('${widget.title}'.toTitleCase()) ,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -160,7 +114,7 @@ class _PopBookInfosState extends State<PopBookInfos> {
                         Container(
                             height: 250,
                             width: MediaQuery.of(context).size.width,
-                            child: Opacity(opacity:0.4,child: Image.network(widget.image, fit: BoxFit.cover,))
+                            child: Opacity(opacity:0.4,child: widget.image)
                         ),
                         Container(
                           height: 250.0,
@@ -187,7 +141,7 @@ class _PopBookInfosState extends State<PopBookInfos> {
                           padding: const EdgeInsets.all(20.0),
                           child: Visibility(
                             visible: false,
-                            child: Image.network(widget.image, fit: BoxFit.cover,),
+                            child: Container(child: widget.image),
                           ),
                         ),
                       ),
@@ -208,7 +162,7 @@ class _PopBookInfosState extends State<PopBookInfos> {
                             width: 140,
                             child: Hero(
                                 tag: widget.tag,
-                                child: Image.network(widget.image, fit: BoxFit.cover,)
+                                child: Container(child: widget.image),
                             ),
                           ),
                         ),
@@ -218,7 +172,7 @@ class _PopBookInfosState extends State<PopBookInfos> {
                           children: [
                             Text('author: ${widget.author}'.toTitleCase(), style: TextStyle(color: Colors.grey.shade600,fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),),
                             SizedBox(height: 5,),
-                            Text(widget.publishedDate ?? 'november 14, 2022'.toTitleCase(), style: TextStyle(color: Colors.grey.shade400,fontSize: 12),),
+                            Text('november 14, 2022'.toTitleCase(), style: TextStyle(color: Colors.grey.shade400,fontSize: 12),),
                           ],
                         )
                       ],
@@ -246,7 +200,7 @@ class _PopBookInfosState extends State<PopBookInfos> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(widget.averageRating != 'null' ? widget.averageRating : '4.8', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+                                Text('4.8', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
                                 Text('/5', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 10, color: Colors.grey),)
                               ],
                             ),
@@ -277,7 +231,7 @@ class _PopBookInfosState extends State<PopBookInfos> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(widget.pageCount ?? "340", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+                                Text('340', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
                                 SizedBox(width: 2,),
                                 Text('pages'.toTitleCase(), style: TextStyle(fontWeight: FontWeight.bold,fontSize: 10, color: Colors.grey),)
                               ],
@@ -313,30 +267,30 @@ class _PopBookInfosState extends State<PopBookInfos> {
                     child: secondHalf!.isEmpty
                         ?  Text(firstHalf!, textAlign: TextAlign.justify,style:TextStyle(color: Colors.grey.shade700))
                         :  Column(
-                          children: <Widget>[
-                            Stack(
-                                children: [
-                                  Container(
-                                      child: Text(flag ? (firstHalf! + "...") : (firstHalf! + secondHalf!) ,style:TextStyle(color: Colors.grey.shade700), textAlign: TextAlign.justify,)
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      // color: Colors.white,
-                                        gradient: LinearGradient(
-                                          begin: FractionalOffset.bottomCenter,
-                                          end: FractionalOffset.topCenter,
-                                          colors: [
-                                            Colors.white.withOpacity(0.8),
-                                            Colors.white.withOpacity(0),
-                                            Colors.white.withOpacity(0),
-                                          ],
-                                          // stops: [
-                                          //   0.0,
-                                          //   1.0
-                                          // ]
-                                        )),
-                                  )
-                                ]),
+                      children: <Widget>[
+                        Stack(
+                            children: [
+                              Container(
+                                  child: Text(flag ? (firstHalf! + "...") : (firstHalf! + secondHalf!) ,style:TextStyle(color: Colors.grey.shade700), textAlign: TextAlign.justify,)
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  // color: Colors.white,
+                                    gradient: LinearGradient(
+                                      begin: FractionalOffset.bottomCenter,
+                                      end: FractionalOffset.topCenter,
+                                      colors: [
+                                        Colors.white.withOpacity(0.8),
+                                        Colors.white.withOpacity(0),
+                                        Colors.white.withOpacity(0),
+                                      ],
+                                      // stops: [
+                                      //   0.0,
+                                      //   1.0
+                                      // ]
+                                    )),
+                              )
+                            ]),
                       ],
                     ),
                   ),

@@ -10,6 +10,7 @@ import 'package:ebiblio/getStarted/getStarted.dart';
 // import 'package:firebase_app_check/firebase_app_check.dart';
 // import 'package:ebiblio/leftMenu/Login.dart';
 
+import 'firebase_options.dart';
 import 'getStarted/first_choice.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -23,6 +24,7 @@ Future<void> main() async {
 
 
   await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform
     // options: FirebaseOptions(
     //     apiKey: 'XijEUSw9BopmwHtllC4M3W8z0',
     //     appId: '1:93688306315:android:108c7f9af8c25f26e0d28e',
