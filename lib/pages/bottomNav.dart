@@ -11,6 +11,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../audio_books/audioBook_page.dart';
 import '../auth_users/Login.dart';
 import '../controllers/google_signin_controller.dart';
 import '../model/userInfo_model.dart';
@@ -182,7 +183,7 @@ class _BottomNavState extends State<BottomNav> {
           ),
           leading: Icon(LineAwesomeIcons.audio_file_1),
           onTap: (){
-            // Navigator.push(context, MaterialPageRoute(builder: (context) => UpgradeAccount()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AudioBookPage()));
           },
         ),
         ListTile(

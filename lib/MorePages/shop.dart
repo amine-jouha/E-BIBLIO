@@ -93,7 +93,6 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
 
 
 
-
   @override
   Widget build(BuildContext context) {
     _provider = Provider.of<HomeProvider>(context, listen: false);
@@ -216,7 +215,6 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                           else return Image.asset('assets/cover2.jpg', fit: BoxFit.cover,);
                                                         },
                                                       ),
-
                                                     ),
                                                     BackdropFilter(
                                                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),

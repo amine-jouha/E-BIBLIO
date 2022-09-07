@@ -243,7 +243,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  void signUp(String email, String password) async {
+  void signUp(String email, String password)  async {
     if(_formKey.currentState!.validate()) {
       await _auth.createUserWithEmailAndPassword(email: email, password: password)
           .then((value) => {postDetailsToFirestore()})

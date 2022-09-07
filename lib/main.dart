@@ -1,3 +1,4 @@
+import 'package:ebiblio/audio_books/services/service_locator.dart';
 import 'package:ebiblio/providers/addBook_provider.dart';
 import 'package:ebiblio/providers/home_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,6 +11,7 @@ import 'package:ebiblio/getStarted/getStarted.dart';
 // import 'package:firebase_app_check/firebase_app_check.dart';
 // import 'package:ebiblio/leftMenu/Login.dart';
 
+import 'audio_books/page_manager.dart';
 import 'firebase_options.dart';
 import 'getStarted/first_choice.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -19,6 +21,7 @@ import 'pages/welcome.dart';
 
 Future<void> main() async {
   // ClassBuilder.registerClasses();
+  await setupServiceLocator();
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting();
 
@@ -44,9 +47,26 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<PageManager>().init();
+  }
+
+  @override
+  void dispose() {
+    getIt<PageManager>().dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -58,7 +78,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.brown,
+          primarySwatch: Colors.blue,
           // brightness: Brightness.dark
         ),
         home: FirstChoice(),

@@ -58,6 +58,10 @@ dependencies:
   cross_file_image: ^1.0.0
   device_preview: ^1.1.0
   firebase_database: ^9.1.0
+  audio_video_progress_bar: ^0.5.0
+  get_it: ^7.1.2
+  just_audio: ^0.9.5
+  audio_service: ^0.18.0-beta.0
 
 
   # The following adds the Cupertino Icons font to your application.

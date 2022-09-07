@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../model/userInfo_model.dart';
 import '../pages/bottomNav.dart';
@@ -113,11 +114,11 @@ class _UpgradeAccountState extends State<UpgradeAccount> {
                     borderRadius: BorderRadius.circular(5),
                     child: MaterialButton(
                       onPressed: () async{
-                        print('c fait');
                         await confirm();
                         print(user!.uid);
                         print('c fait');
                         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => BottomNav()), (route) => false);
+
                         //pop up validation success
                         //just a coté du name y'aura (seller)
                         //function to return the old account
@@ -142,18 +143,13 @@ class _UpgradeAccountState extends State<UpgradeAccount> {
     );
   }
   confirm() async {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     // userInfos.upgraded = true;
-
-
-    await CircularProgressIndicator();
     await firebaseFirestore.collection('UserInfo').doc(user!.uid).update({"upgraded" : true}).then((value)
-    => print("DocumentSnapSHot successfuly updated! bro"),
+    => Fluttertoast.showToast(msg: 'Configure Seller Account For You...'),
     onError: (e) => print('Error Updating Document $e')
     );
     // await firebaseFirestore.collection('UserInfo').doc(user!.uid).update(userInfos.toMap());
-    print(userInfos.ville);
-    print(userInfos.upgraded);
     // await FirebaseFirestore.instance.collection('UserInfo').doc(user!.uid).get().then((value) {
     //   // this.userInfos = UserInfos.fromMap(value.data());
     //   userInfos.upgraded = true as Bool;
