@@ -7,8 +7,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ebiblio/model/userInfo_model.dart';
 import 'package:ebiblio/pages/SecondHome.dart';
 import 'package:ebiblio/pages/data_chip.dart';
+import 'package:provider/provider.dart';
 
 import '../model/user_model.dart';
+import '../providers/home_provider.dart';
+import 'bottomNav.dart';
 
 class MyDialog extends StatefulWidget {
   const MyDialog({Key? key}) : super(key: key);
@@ -61,7 +64,7 @@ class _MyDialogState extends State<MyDialog> {
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       body: isComplete ?
-      confirm(ville!, type) :
+      Container(child: confirm(ville!, type),) :
       SingleChildScrollView(
         child: Center(
           child: SingleChildScrollView(
@@ -180,27 +183,9 @@ class _MyDialogState extends State<MyDialog> {
                         title: Text('Accept Condition'),
                         content: Padding(
                           padding: const EdgeInsets.only(right: 5.0),
-                          child: Row(
-                            // crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              // Checkbox(
-                              //     value: check,
-                              //     onChanged: (bool? value) {
-                              //       if (value != null) {
-                              //         setState(() {
-                              //           this.check = value;
-                              //         });
-                              //       }
-                              //     }
-                              // ),
-                              FittedBox(child: Text('I accept term and condition,'
-                                  ' privacy policy\ndetails in this link: https://e-biblio.com',
-                                style: TextStyle(fontSize: 11.5),)),
-                              // TextFormField(
-                              //   decoration: InputDecoration(labelText: 'OK accept'),
-                              // )
-                            ],
-                          ),
+                          child: Text('I accept term and condition,'
+                              ' privacy policy details in this link:\nhttps://e-biblio.com/privacy-policy',
+                            style: TextStyle(fontSize: 11.5),textAlign: TextAlign.justify,),
                         ),
                         isActive: _currentStep >= 0,
                         state: _currentStep >= 2 ?
@@ -216,6 +201,9 @@ class _MyDialogState extends State<MyDialog> {
     );
   }
   confirm(String ville, List<String> type) async {
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
+    HProvider.changeTutoBool();
+
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     UserInfos userInfos = UserInfos();
@@ -231,9 +219,8 @@ class _MyDialogState extends State<MyDialog> {
     //     onError: (e) => print('Error Updating Document $e')
     // );
 
-    await CircularProgressIndicator();
-    Navigator.of(context).pop();
     await firebaseFirestore.collection('UserInfo').doc(user!.uid).set(userInfos.toMap());
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => BottomNav()), (route) => false);
 
 
 

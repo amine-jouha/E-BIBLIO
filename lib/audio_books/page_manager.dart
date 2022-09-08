@@ -10,6 +10,7 @@ import 'services/service_locator.dart';
 class PageManager {
   // Listeners: Updates going to the UI
   final currentSongTitleNotifier = ValueNotifier<String>('');
+  final currentSongDescriptionNotifier = ValueNotifier<String>('');
   final playlistNotifier = ValueNotifier<List<String>>([]);
   final progressNotifier = ProgressNotifier();
   final repeatButtonNotifier = RepeatButtonNotifier();
@@ -30,7 +31,7 @@ class PageManager {
     _listenToBufferedPosition();
     _listenToTotalDuration();
     _listenToChangesInSong();
-    nextImage = 3;
+    // nextImage = 3;
   }
 
   Future<void> _loadPlaylist() async {
@@ -41,6 +42,7 @@ class PageManager {
               id: song['id'] ?? '',
               album: song['album'] ?? '',
               title: song['title'] ?? '',
+              displayDescription: song['description'] ?? '',
               extras: {'url': song['url']},
             ))
         .toList();
@@ -52,6 +54,7 @@ class PageManager {
       if (playlist.isEmpty) {
         playlistNotifier.value = [];
         currentSongTitleNotifier.value = '';
+        currentSongDescriptionNotifier.value = '';
       } else {
         final newList = playlist.map((item) => item.title).toList();
         playlistNotifier.value = newList;
@@ -114,6 +117,7 @@ class PageManager {
   void _listenToChangesInSong() {
     _audioHandler.mediaItem.listen((mediaItem) {
       currentSongTitleNotifier.value = mediaItem?.title ?? '';
+      currentSongDescriptionNotifier.value = mediaItem?.displayDescription ?? '';
       _updateSkipButtons();
     });
   }
@@ -139,6 +143,7 @@ class PageManager {
   _audioHandler.skipToPrevious();
   nextImage--;
 }
+
   void next()  {
   _audioHandler.skipToNext();
   nextImage++;

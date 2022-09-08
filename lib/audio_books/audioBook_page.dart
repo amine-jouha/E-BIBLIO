@@ -1,6 +1,9 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ebiblio/audio_books/services/playlist_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/home_provider.dart';
 import 'data_podcast.dart';
 import 'notifiers/play_button_notifier.dart';
 import 'notifiers/progress_notifier.dart';
@@ -37,6 +40,7 @@ class _AudioBookPageState extends State<AudioBookPage> {
             SizedBox(height: 10,),
             ImageBook(),
             CurrentSongTitle(),
+            CurrentSongDescription(),
             // Playlist(),
             Padding(
               padding: const EdgeInsets.all(18.0),
@@ -72,28 +76,23 @@ class CurrentSongTitle extends StatelessWidget {
     );
   }
 }
-// class ImagesList extends StatelessWidget {
-//   const ImagesList({Key? key}) : super(key: key);
-//   @override
-//   Widget build(BuildContext context) {
-//     final pageManager = getIt<PageManager>();
-//     return Expanded(
-//       child: ValueListenableBuilder<List<String>>(
-//         valueListenable: pageManager.imageListNotifier,
-//         builder: (context, imageListNotifier, _) {
-//           return ListView.builder(
-//             itemCount: imageListNotifier.length,
-//             itemBuilder: (context, index) {
-//               return ListTile(x
-//                 title: Text('${imageListNotifier[index]}'),
-//               );
-//             },
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
+
+class CurrentSongDescription extends StatelessWidget {
+  const CurrentSongDescription({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+    return ValueListenableBuilder<String>(
+      valueListenable: pageManager.currentSongDescriptionNotifier,
+      builder: (_, description, __) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 5.0),
+          child: Text(description, style: TextStyle(fontSize: 15,), maxLines: 1, overflow: TextOverflow.ellipsis,),
+        );
+      },
+    );
+  }
+}
 
 class Playlist extends StatelessWidget {
   const Playlist({Key? key}) : super(key: key);
@@ -146,25 +145,30 @@ class ImageBook extends StatefulWidget {
 
 class _ImageBookState extends State<ImageBook> {
 
-  var _current = 0;
+
 
   AnimatedContainer dotIndicator(index) {
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
     return AnimatedContainer(
       margin: const EdgeInsets.only(right: 5),
       padding: const EdgeInsets.all(10),
       duration: const Duration(milliseconds: 400),
       height: 4,
-      width: _current == index ? 22 : 9,
+      width: HProvider.currentNum == index ? 22 : 9,
       decoration: BoxDecoration(
-        color: _current == index ? Colors.blue : Colors.grey.shade300,
+        color: HProvider.currentNum == index ? Colors.blue : Colors.grey.shade300,
         // shape: _current == index ? BoxShape.rectangle : BoxShape.circle,
-        borderRadius: _current == index ? BorderRadius.circular(30) : BorderRadius.circular(5),
+        borderRadius: HProvider.currentNum == index ? BorderRadius.circular(30) : BorderRadius.circular(5),
       ),
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
+
 
     final pageManager = getIt<PageManager>();
     return ValueListenableBuilder<List<String>>(
@@ -172,7 +176,7 @@ class _ImageBookState extends State<ImageBook> {
       builder: (context, playlistTitles, _) {
         return Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 8.0),
             child: Column(
               children: [
                 CarouselSlider.builder(
@@ -181,20 +185,20 @@ class _ImageBookState extends State<ImageBook> {
                       enlargeCenterPage: true,
                       aspectRatio: 20/9,
                       autoPlayCurve: Curves.fastOutSlowIn,
-                      enableInfiniteScroll: true,
+                      enableInfiniteScroll: false,
                       autoPlayAnimationDuration: const Duration(milliseconds: 800),
                       viewportFraction: 0.8,
                       height: 400,
                       onPageChanged: (value, carousel) {
                         setState(() {
-                          if (_current < value) {
-                           _current = value;
+                          print(value);
+                          if (HProvider.currentNum < value) {
+                            HProvider.currentNum = value;
                            pageManager.next();
                           } else {
-                            _current = value;
+                            HProvider.currentNum = value;
                             pageManager.previous();
                           }
-
                         });
                       }
                   ),
@@ -323,13 +327,22 @@ class PreviousSongButton extends StatelessWidget {
   const PreviousSongButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
     final pageManager = getIt<PageManager>();
     return ValueListenableBuilder<bool>(
       valueListenable: pageManager.isFirstSongNotifier,
       builder: (_, isFirst, __) {
         return IconButton(
           icon: Icon(Icons.skip_previous),
-          onPressed: (isFirst) ? null : pageManager.previous,
+          // onPressed: (isFirst) ? null : pageManager.previous,
+          onPressed: () {
+            if(isFirst) {
+              null;
+            } else {
+              pageManager.previous();
+              HProvider.currentNum--;
+            }
+          },
         );
       },
     );
@@ -374,13 +387,23 @@ class NextSongButton extends StatelessWidget {
   const NextSongButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
+
     final pageManager = getIt<PageManager>();
     return ValueListenableBuilder<bool>(
       valueListenable: pageManager.isLastSongNotifier,
       builder: (_, isLast, __) {
         return IconButton(
           icon: Icon(Icons.skip_next),
-          onPressed: (isLast) ? null : pageManager.next,
+          // onPressed: (isLast) ? null : pageManager.next,
+          onPressed: () {
+            if(isLast) {
+               null;
+            } else {
+              pageManager.next();
+              HProvider.currentNum++;
+            }
+          },
         );
       },
     );

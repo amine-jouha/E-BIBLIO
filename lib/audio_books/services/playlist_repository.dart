@@ -24,8 +24,9 @@ class DemoPlaylist extends PlaylistRepository {
     _songIndex = (_songIndex % _maxSongNumber) + 1;
     return {
       'id': _songIndex.toString().padLeft(3, '0'),
-      'title': 'AudioBook $_songIndex',
+      'title': 'e-Biblio AudioBook $_songIndex',
       'album': 'e-Biblio',
+      'description' : allPdItemsContent[_songIndex].title,
       // 'image':allPdItemsContent[_songIndex].image,
       'url':
       allPdItemsContent[_songIndex].url[0],

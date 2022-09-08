@@ -17,11 +17,13 @@ import 'package:ebiblio/pages/more_recommended.dart';
 import 'package:ebiblio/upgradeAccount/upgradeAccount.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../auth_users/Login.dart';
 import '../controllers/google_signin_controller.dart';
 import '../dynamic_Link/dynamicLink.dart';
 import '../dynamic_Link/page_test.dart';
 import '../model/user_model.dart';
+import '../providers/home_provider.dart';
 import '../style_key.dart';
 
 class SecondHome extends StatefulWidget {
@@ -73,10 +75,37 @@ class _SecondHomeState extends State<SecondHome> {
   }
 
 
+  TutorialCoachMark? tutorialCoachMark;
+  List<TargetFocus> targets = [];
+
+
+  GlobalKey key = GlobalKey(debugLabel: 'd');
+  GlobalKey _key1 = GlobalKey(debugLabel: 's');
+  GlobalKey _key2 = GlobalKey(debugLabel: 'a');
+  GlobalKey _key3 = GlobalKey(debugLabel: 'k');
+
+
+  void _layout(_){
+    Future.delayed(Duration(milliseconds: 100));
+    showTutorial();
+  }
 
   @override
   void initState() {
     super.initState();
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
+
+    //modify this
+
+    Future.delayed(Duration(microseconds: 2), () {
+      if (HProvider.isTuto == true && userInfos.ville == null) {
+        HProvider.isTuto == false;
+        initTargets();
+        WidgetsBinding.instance.addPostFrameCallback(_layout);
+
+      }
+    });
+
     initDynamicLinks();
     FirebaseFirestore.instance.collection('users').doc(user!.uid).get().then((value) {
       this.loggedInUser = UserModel.fromMap(value.data());
@@ -132,20 +161,6 @@ class _SecondHomeState extends State<SecondHome> {
       ),
     );
   }
-
-
-
-
-  // void setStateIfMounted(openDialog()) {
-  //   if (this.mounted) {
-  //     setState(openDialog());
-  //   }
-  // }
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -233,10 +248,11 @@ class _SecondHomeState extends State<SecondHome> {
                         Padding(
                           padding: const EdgeInsets.only(top:8.0, right: 8.0),
                           child: GestureDetector(
+                              key: _key1,
                               onTap: () {
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => SeeRecommended()));
                               },
-                              child: Text('See More>', style: TextStyle(fontSize: 15,decoration: TextDecoration.underline, color: Colors.orange ),)
+                              child: Text('See More>', style: TextStyle(fontSize: 12,decoration: TextDecoration.underline, color: Colors.orange ),)
                           ),
                         ),
 
@@ -248,8 +264,10 @@ class _SecondHomeState extends State<SecondHome> {
                     child: Stack(
                       children: [
                         Padding(
+                          key: key,
                           padding: const EdgeInsets.all(8.0),
                           child: CarouselSlider.builder(
+
                             options: CarouselOptions(
                                 autoPlay: true,
                                 enlargeCenterPage: true,
@@ -324,19 +342,7 @@ class _SecondHomeState extends State<SecondHome> {
                                     ],
                                   ),
                                 );
-                                // return Stack(
-                                //   children: [
-                                //     Opacity(
-                                //       opacity: 0.3,
-                                //       child: ClipRRect(
-                                //           borderRadius: BorderRadius.circular(30),
-                                //           child:  Image(image:AssetImage(imgList[index]),
-                                //             fit: BoxFit.cover,height: 200,width: 360,)
-                                //       ),
-                                //     ),
-                                //
-                                //   ],
-                                // );
+
                               }if (userInfos.type!.contains(onFictif[index].type)) {
                                 return InkWell(
                                   onTap: () {
@@ -531,187 +537,10 @@ class _SecondHomeState extends State<SecondHome> {
                     ),
                   ),
 
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Container(
-                  //     height: 220,
-                  //     width: MediaQuery.of(context).size.width,
-                  //     child: Stack(
-                  //       children: [
-                  //         Container(
-                  //           // height: MediaQuery.of(context).size.height/4,
-                  //           width: 160,
-                  //           decoration: BoxDecoration(
-                  //             borderRadius: BorderRadius.circular(20),
-                  //             color: Colors.lightBlue,
-                  //           ),
-                  //         ),
-                  //         Positioned(
-                  //           left: 100,
-                  //           top: 40,
-                  //           child: Container(
-                  //             // height:110% MediaQuery.of(context).size.height,
-                  //             width: MediaQuery.of(context).size.width/1.4,
-                  //             child: Card(
-                  //               shape: RoundedRectangleBorder(
-                  //                 side: BorderSide(color: Colors.white70, width: 1),
-                  //                 borderRadius: BorderRadius.circular(5),
-                  //               ),
-                  //               child: ListTile(
-                  //                 contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
-                  //                   title: Column(
-                  //                     crossAxisAlignment: CrossAxisAlignment.start,
-                  //                     children: [
-                  //                       Padding(
-                  //                         padding: const EdgeInsets.only(bottom: 10.0),
-                  //                         child: Text('data of books', style: TextStyle(color: Colors.black12, fontSize: 15,),),
-                  //                       ),
-                  //                       Text('loading text from app tout ce', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black87),maxLines: 2,overflow: TextOverflow.ellipsis,),
-                  //                     ],
-                  //                   ),
-                  //                 trailing:Container(
-                  //                   height: double.infinity,
-                  //                     child: Icon(Icons.arrow_right)
-                  //                 ),
-                  //
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  // CarouselSlider.builder(
-                  //   options: CarouselOptions(
-                  //       autoPlay: true,
-                  //       enlargeCenterPage: true,
-                  //       aspectRatio: 16/9,
-                  //       autoPlayCurve: Curves.fastOutSlowIn,
-                  //       enableInfiniteScroll: true,
-                  //       autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  //       viewportFraction: 0.8,
-                  //       onPageChanged: (value, carousel) {
-                  //         setState(() {
-                  //           _current = value;
-                  //         });
-                  //       }
-                  //   ),
-                  //   itemCount: imgBook.length,
-                  //   itemBuilder: (BuildContext context, index, realIdx ) {
-                  //     if (userInfos.type == null) {
-                  //       return Stack(
-                  //         children: [
-                  //           Opacity(
-                  //             opacity: 0.3,
-                  //             child: ClipRRect(
-                  //                 borderRadius: BorderRadius.circular(30),
-                  //                 child:  Image(image:AssetImage(imgList[index]),
-                  //                   fit: BoxFit.cover,height: 200,width: 360,)
-                  //             ),
-                  //           ),
-                  //
-                  //         ],
-                  //       );
-                  //     }if (userInfos.type!.contains(onFictif[index].type)) {
-                  //       return Stack(
-                  //         children: [
-                  //           Opacity(
-                  //             opacity: 0.5,
-                  //             child: ClipRRect(
-                  //                 borderRadius: BorderRadius.circular(30),
-                  //                 child:  Image(image:AssetImage(imgList[index]),
-                  //                   fit: BoxFit.cover,height: 200,width: 360,)
-                  //             ),
-                  //           ),
-                  //           Positioned(
-                  //             left: 10,
-                  //             top: 15,
-                  //             child: Image(image: AssetImage(onFictif[index].imageBook),height: 170,),
-                  //           ),
-                  //           Positioned(
-                  //               right: 50,
-                  //               top: 15,
-                  //               child: CircleAvatar(
-                  //                 backgroundImage: AssetImage(onFictif[index].imageProfil),
-                  //                 radius: 43,
-                  //               )
-                  //           ),
-                  //           Positioned(
-                  //             left:124,
-                  //             top:100,
-                  //             child: Container(
-                  //                 height: 30,
-                  //                 width: 190,
-                  //                 // color:Colors.blue,
-                  //                 child: Center(child: FittedBox(child: Text(onFictif[index].name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)))
-                  //             ),
-                  //           ),
-                  //           Positioned(
-                  //             left:220,
-                  //             top:170,
-                  //             child: FittedBox(child: Text(onFictif[index].exchange, style: TextStyle(fontSize: 15),)),
-                  //           ),
-                  //
-                  //         ],
-                  //       );
-                  //     }
-                  //     else {
-                  //       return Stack(
-                  //         children: [
-                  //           Opacity(
-                  //             opacity: 0.5,
-                  //             child: ClipRRect(
-                  //                 borderRadius: BorderRadius.circular(30),
-                  //                 child:  Image(image:AssetImage(imgList[index]),
-                  //                   fit: BoxFit.cover,height: 200,width: 360,)
-                  //             ),
-                  //           ),
-                  //           Positioned(
-                  //             left: 10,
-                  //             top: 15,
-                  //             child: Image(image: AssetImage(onFictif[index].imageBook),height: 170,),
-                  //           ),
-                  //           Positioned(
-                  //               right: 50,
-                  //               top: 15,
-                  //               child: CircleAvatar(
-                  //                 backgroundImage: AssetImage(onFictif[index].imageProfil),
-                  //                 radius: 43,
-                  //               )
-                  //           ),
-                  //           Positioned(
-                  //             left:124,
-                  //             top:100,
-                  //             child: Container(
-                  //                 height: 30,
-                  //                 width: 190,
-                  //                 // color:Colors.blue,
-                  //                 child: Center(child: FittedBox(child: Text(onFictif[index].name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)))
-                  //             ),
-                  //           ),
-                  //           Positioned(
-                  //             left:220,
-                  //             top:170,
-                  //             child: FittedBox(child: Text(onFictif[index].exchange, style: TextStyle(fontSize: 15),)),
-                  //           ),
-                  //
-                  //         ],
-                  //       );
-                  //     }
-                  //
-                  //   },
-                  //
-                  //
-                  // ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: List.generate(
-                  //       imgBook.length,
-                  //           (index) => dotIndicator(index)
-                  //   ),),
+
                   SizedBox(height: 30,),
                   Padding(
+                    key: _key2,
                     padding: const EdgeInsets.only(left: 18),
                     child: Text('In Your City', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),),
                   ),
@@ -868,6 +697,7 @@ class _SecondHomeState extends State<SecondHome> {
                   SizedBox(height: 10,),
                   Divider(),
                   Container(
+                    key: _key3,
                     height: 100,
                     child: ListView.builder(
                         itemCount: avatar.length,
@@ -892,16 +722,10 @@ class _SecondHomeState extends State<SecondHome> {
                     ),
                   ),
                   Divider(),
-                  // ElevatedButton(
-                  //     onPressed: () {Provider.of<LoginController>(context, listen: false).logout();},
-                  //     child: Text('logout')
-                  // ),
                   Container(
                     color: Colors.grey,
                     height: 60,
                   ),
-
-
                 ],
               ),
               ElevatedButton(
@@ -925,6 +749,173 @@ class _SecondHomeState extends State<SecondHome> {
     );
   }
 
+  void initTargets() {
+    targets.add(TargetFocus(
+        identify: "Target 0",
+        keyTarget: _key1,
+        contents: [
+          TargetContent(
+              align: ContentAlign.bottom,
+              child: Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "See More",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20.0),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        "See More Books in Recommended for you, according to your type's Book Choice",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    )
+                  ],
+                ),
+              ))
+        ],
+      ));
+    targets.add(TargetFocus(
+        identify: "Target 1",
+        keyTarget: key,
+        color: Colors.red,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Example of Book",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20.0),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      "The Book Here is a Example for a book you can like because it's in your favorite book's type",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ));
+    targets.add(TargetFocus(
+      identify: "Target 2",
+      keyTarget: _key2,
+      contents: [
+        TargetContent(
+            align: ContentAlign.top,
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: Text(
+                      "Book In Your City",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),
+                    ),
+                  ),
+                  Text(
+                    "Yes, You can change your book with another just in your City",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            )),
+        TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Text(
+                    "BUT We Have Some Rules",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),
+                  ),
+                ),
+                Container(
+                  child: Text(
+                    "E-Biblio protect their users and her policy so, when you have to change your book do it in e-biblio",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ))
+      ],
+      shape: ShapeLightFocus.Circle,
+    ));
+    targets.add(TargetFocus(
+      identify: "Target 3",
+      keyTarget: _key3,
+      color: Colors.grey,
+      contents: [
+        TargetContent(
+            align: ContentAlign.top,
+            child: Container(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Image.asset(
+                      "assets/ebiblio2.png",fit: BoxFit.contain,
+                      height: 120,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: Text(
+                      "E-biblio Live",
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20.0),
+                    ),
+                  ),
+                  Text(
+                    "You Can live and chat in e-biblio and speak with others about whatever in books",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            ))
+      ],
+      shape: ShapeLightFocus.Circle,
+    ));
+    HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
+    HProvider.changeTutoBool();
+  }
+
+  void showTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      context,
+      targets: targets,
+      colorShadow: Colors.brown,
+      textSkip: "SKIP",
+      paddingFocus: 10,
+      opacityShadow: 0.8,
+      onFinish: () {
+        print("finish");
+      },
+      onClickTarget: (target) {
+        print('onClickTarget: $target');
+      },
+      onSkip: () {
+        print("skip");
+      },
+      onClickOverlay: (target) {
+        print('onClickOverlay: $target');
+      },
+    )..show();
+  }
 
 }
 
@@ -1159,7 +1150,10 @@ class _CardsContState extends State<CardsCont> {
       ),
     );
   }
+
 }
+
+
 
 //
 // class Ondialogue extends StatefulWidget {

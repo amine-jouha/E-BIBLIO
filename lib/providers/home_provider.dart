@@ -9,6 +9,8 @@ class HomeProvider with ChangeNotifier {
   List<BookModel> books = [];
   int page = 0;
   bool isLoading = true;
+  bool isTuto = false;
+  var currentNum = 0;
   String? query = "";
 
   Future<void> getBooks() async {
@@ -34,6 +36,11 @@ class HomeProvider with ChangeNotifier {
 
   void showLoading() {
     isLoading = true;
+    notifyListeners();
+  }
+
+  void changeTutoBool() {
+    isTuto =! isTuto;
     notifyListeners();
   }
 }
