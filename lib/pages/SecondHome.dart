@@ -25,6 +25,7 @@ import '../dynamic_Link/page_test.dart';
 import '../model/user_model.dart';
 import '../providers/home_provider.dart';
 import '../style_key.dart';
+import 'message_Page.dart';
 
 class SecondHome extends StatefulWidget {
   const SecondHome({Key? key}) : super(key: key);
@@ -99,10 +100,9 @@ class _SecondHomeState extends State<SecondHome> {
 
     Future.delayed(Duration(microseconds: 2), () {
       if (HProvider.isTuto == true && userInfos.ville == null) {
-        HProvider.isTuto == false;
-        initTargets();
-        WidgetsBinding.instance.addPostFrameCallback(_layout);
-
+          HProvider.isTuto == false;
+          initTargets();
+          WidgetsBinding.instance.addPostFrameCallback(_layout);
       }
     });
 
@@ -892,6 +892,8 @@ class _SecondHomeState extends State<SecondHome> {
     ));
     HomeProvider HProvider = Provider.of<HomeProvider>(context, listen: false);
     HProvider.changeTutoBool();
+
+
   }
 
   void showTutorial() {
@@ -904,12 +906,16 @@ class _SecondHomeState extends State<SecondHome> {
       opacityShadow: 0.8,
       onFinish: () {
         print("finish");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MessagePage()), (route) => false);
+
       },
       onClickTarget: (target) {
         print('onClickTarget: $target');
       },
       onSkip: () {
         print("skip");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MessagePage()), (route) => false);
+
       },
       onClickOverlay: (target) {
         print('onClickOverlay: $target');
