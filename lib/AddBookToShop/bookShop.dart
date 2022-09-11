@@ -146,6 +146,7 @@ class _BookShopState extends State<BookShop> {
   // }
   //
   var url ='';
+  var url2 ='';
 
   Future<void> uploadSelectedImages() async {
     print("--------------------------------");
@@ -155,11 +156,15 @@ class _BookShopState extends State<BookShop> {
 
     for (var i = 0; i < selectedImages.length; i++) {
       final ref = FirebaseStorage.instance.ref().child('book${loggedInUser.uid.toString()}/book${userInfos.bookInShop!.toString()}/$i${loggedInUser.userName.toString()}');
+      final ref2 = FirebaseStorage.instance.ref().child('book/${userInfos.bookInShop!.toString()}');
 
       // await ref.putFile(File(selectedImages[i].path));
       UploadTask task = ref.putFile(File(selectedImages[i].path));
+      UploadTask task2 = ref2.putFile(File(selectedImages[i].path));
       TaskSnapshot snapshot = await task;
+      TaskSnapshot snapshot2 = await task2;
       url = await snapshot.ref.getDownloadURL();
+      url2 = await snapshot2.ref.getDownloadURL();
       print(url);
     }
 
@@ -419,14 +424,14 @@ class _BookShopState extends State<BookShop> {
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () async{
           await AddBookToShop(
-                  TitleEditingController.text,
-                  AuthorEditingController.text,
-                  PageEditingController.text,
-                  BookDateEditingController.text,
-                  PriceEditingController.text,
-                  _currentSelectedValue!,
-                  DescriptionEditingController.text
-              );
+              TitleEditingController.text,
+              AuthorEditingController.text,
+              PageEditingController.text,
+              BookDateEditingController.text,
+              PriceEditingController.text,
+              _currentSelectedValue!,
+              DescriptionEditingController.text
+          );
         },
         child: Text(
           'Submit Book',
@@ -438,135 +443,149 @@ class _BookShopState extends State<BookShop> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Book To Shop'),
-        centerTitle: true,
-      ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 15,),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                    child: Text('Infos Book', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),textAlign: TextAlign.start,)
-                ),
-                SizedBox(height: 15,),
-                TitleBook,
-                SizedBox(height: 15,),
-                authorName,
-                SizedBox(height: 15,),
-                PageNum,
-                SizedBox(height: 15,),
-                BookDate,
-                SizedBox(height: 15,),
-                PriceBook,
-                SizedBox(height: 15,),
-                Condition,
-                SizedBox(height: 15,),
-                Description,
-                SizedBox(height: 25,),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('Add Images', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),),
-                      Text('5 images max', style: TextStyle(fontSize: 10, color: Colors.grey.shade700),),
-                      SizedBox(height: 15,),
-                      Row(
-                        children: [
-                          // Container(
-                          //   height: 60,
-                          //   width: 60,
-                          //   decoration: BoxDecoration(
-                          //       border: Border.all(color: Colors.grey),
-                          //       color: Colors.white,
-                          //       borderRadius: BorderRadius.circular(10)
-                          //   ),
-                          //   child: pickedFile != null
-                          //         ? ClipRRect(
-                          //           borderRadius: BorderRadius.circular(10),
-                          //           child: Image.file(
-                          //                 File(pickedFile!.path!),
-                          //                 fit: BoxFit.cover,
-                          //               ),
-                          //                     )
-                          //         : Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                          // ),
-                          // SizedBox(width: 5,),
-                          // Container(
-                          //   height: 60,
-                          //   width: 60,
-                          //   decoration: BoxDecoration(
-                          //       border: Border.all(color: Colors.grey),
-                          //       color: Colors.white,
-                          //       borderRadius: BorderRadius.circular(10)
-                          //   ),
-                          //   child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                          // ),
-                          // SizedBox(width: 5,),
-                          // Container(
-                          //   height: 60,
-                          //   width: 60,
-                          //   decoration: BoxDecoration(
-                          //       border: Border.all(color: Colors.grey),
-                          //       color: Colors.white,
-                          //       borderRadius: BorderRadius.circular(10)
-                          //   ),
-                          //   child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                          // ),
-                          Visibility(
-                            visible: isVisible,
-                            child: Container(
-                              height: 80,
-                              width: 260,
-                              child: ListView.builder(
-                                  itemCount: selectedImages.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (BuildContext context, int index) {
-                                     final asset = selectedImages[index];
-                                    print('***********');
-                                    print(asset);
-                                        return Row(
-                                          children: [
-                                            Container(
-                                                  height: 60,
-                                                  width: 60,
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.grey),
-                                                      color: Colors.white,
-                                                      borderRadius: BorderRadius.circular(10)
-                                                  ),
-                                                  child: selectedImages != []
-                                                         ? ClipRRect(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              // child: AssetThumb(asset: asset, width: 60, height: 60, )
-                                                              child: Image(image: XFileImage(asset), fit: BoxFit.fill,),
-                                                         )
-                                                         : Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
-                                              ),
-                                            SizedBox(width: 5,)
-                                          ],
-                                        );
-                                  }
+        appBar: AppBar(
+          title: Text('Add Book To Shop'),
+          centerTitle: true,
+        ),
+        body: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 15,),
+                  Container(
+                      width: MediaQuery.of(context).size.width - 40,
+                      child: Text('Infos Book', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),textAlign: TextAlign.start,)
+                  ),
+                  SizedBox(height: 15,),
+                  TitleBook,
+                  SizedBox(height: 15,),
+                  authorName,
+                  SizedBox(height: 15,),
+                  PageNum,
+                  SizedBox(height: 15,),
+                  BookDate,
+                  SizedBox(height: 15,),
+                  PriceBook,
+                  SizedBox(height: 15,),
+                  Condition,
+                  SizedBox(height: 15,),
+                  Description,
+                  SizedBox(height: 25,),
+                  Container(
+                    width: MediaQuery.of(context).size.width - 40,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text('Add Images', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),),
+                        Text('5 images max', style: TextStyle(fontSize: 10, color: Colors.grey.shade700),),
+                        SizedBox(height: 15,),
+                        Row(
+                          children: [
+                            // Container(
+                            //   height: 60,
+                            //   width: 60,
+                            //   decoration: BoxDecoration(
+                            //       border: Border.all(color: Colors.grey),
+                            //       color: Colors.white,
+                            //       borderRadius: BorderRadius.circular(10)
+                            //   ),
+                            //   child: pickedFile != null
+                            //         ? ClipRRect(
+                            //           borderRadius: BorderRadius.circular(10),
+                            //           child: Image.file(
+                            //                 File(pickedFile!.path!),
+                            //                 fit: BoxFit.cover,
+                            //               ),
+                            //                     )
+                            //         : Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                            // ),
+                            // SizedBox(width: 5,),
+                            // Container(
+                            //   height: 60,
+                            //   width: 60,
+                            //   decoration: BoxDecoration(
+                            //       border: Border.all(color: Colors.grey),
+                            //       color: Colors.white,
+                            //       borderRadius: BorderRadius.circular(10)
+                            //   ),
+                            //   child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                            // ),
+                            // SizedBox(width: 5,),
+                            // Container(
+                            //   height: 60,
+                            //   width: 60,
+                            //   decoration: BoxDecoration(
+                            //       border: Border.all(color: Colors.grey),
+                            //       color: Colors.white,
+                            //       borderRadius: BorderRadius.circular(10)
+                            //   ),
+                            //   child: Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                            // ),
+                            Visibility(
+                              visible: isVisible,
+                              child: Container(
+                                height: 80,
+                                width: 260,
+                                child: ListView.builder(
+                                    itemCount: selectedImages.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final asset = selectedImages[index];
+                                      print('***********');
+                                      print(asset);
+                                      return Row(
+                                        children: [
+                                          Container(
+                                            height: 60,
+                                            width: 60,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(color: Colors.grey),
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(10)
+                                            ),
+                                            child: selectedImages != []
+                                                ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              // child: AssetThumb(asset: asset, width: 60, height: 60, )
+                                              child: Image(image: XFileImage(asset), fit: BoxFit.fill,),
+                                            )
+                                                : Center(child: Icon(LineAwesomeIcons.image_1, color: Colors.grey,)),
+                                          ),
+                                          SizedBox(width: 5,)
+                                        ],
+                                      );
+                                    }
+                                ),
                               ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              pickImages();
+                            GestureDetector(
+                              onTap: () {
+                                pickImages();
 
-                              setState(() {
-                                isVisible = true;
-                              });
-                            },
-                            child: selectedImages.length == 5
-                            ? Container(
+                                setState(() {
+                                  isVisible = true;
+                                });
+                              },
+                              child: selectedImages.length == 5
+                                  ? Container(
+                                  height: 60,
+                                  width: 60,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10)
+                                  ),
+                                  child:  ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      // child: AssetThumb(asset: selectedImages[4], width: 60, height: 60, )
+                                      child: Image(image: XFileImage(selectedImages[4]), fit: BoxFit.fill,)
+                                  )
+                              )
+                                  : Container(
                                 height: 60,
                                 width: 60,
                                 decoration: BoxDecoration(
@@ -574,38 +593,24 @@ class _BookShopState extends State<BookShop> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10)
                                 ),
-                                child:  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    // child: AssetThumb(asset: selectedImages[4], width: 60, height: 60, )
-                                    child: Image(image: XFileImage(selectedImages[4]), fit: BoxFit.fill,)
-                                )
-                            )
-                            : Container(
-                              height: 60,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)
+                                child: Center(child: Icon(LineAwesomeIcons.plus, color: Colors.grey.shade600,)),
                               ),
-                              child: Center(child: Icon(LineAwesomeIcons.plus, color: Colors.grey.shade600,)),
                             ),
-                          ),
-                          SizedBox(width: 5,),
+                            SizedBox(width: 5,),
 
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 25,),
-                SubmitButton,
-                SizedBox(height: 25,),
-              ],
+                  SizedBox(height: 25,),
+                  SubmitButton,
+                  SizedBox(height: 25,),
+                ],
+              ),
             ),
           ),
-        ),
-      )
+        )
     );
   }
   AddBookToShop(String title,String author,String numPage,String dateBook,String price,String condition,String description) async {
@@ -615,31 +620,31 @@ class _BookShopState extends State<BookShop> {
     if (_formKey.currentState!.validate()) {
 
 
-    bookFormShop.uid = user!.uid;
-    bookFormShop.title = title;
-    bookFormShop.author = author;
-    bookFormShop.numPage = numPage;
-    bookFormShop.dateBook = dateBook;
-    bookFormShop.price = price;
-    bookFormShop.condition = condition;
-    bookFormShop.description = description;
+      bookFormShop.uid = user!.uid;
+      bookFormShop.title = title;
+      bookFormShop.author = author;
+      bookFormShop.numPage = numPage;
+      bookFormShop.dateBook = dateBook;
+      bookFormShop.price = price;
+      bookFormShop.condition = condition;
+      bookFormShop.description = description;
 
-    uploadSelectedImages();
-
-
+      uploadSelectedImages();
 
 
 
 
 
 
-    Navigator.of(context).pop();
+
+
+      Navigator.of(context).pop();
 
       // await firebaseFirestore.collection('BookFormShop').doc(
       //     user!.uid + bookFormShop.price.toString()).set(bookFormShop.toMap());
 
-    await firebaseFirestore.collection('BookFormShop').doc(
-        user!.uid + userInfos.bookInShop.toString()).set(bookFormShop.toMap());
+      await firebaseFirestore.collection('BookFormShop').doc(
+          user!.uid + userInfos.bookInShop.toString()).set(bookFormShop.toMap());
 
       Fluttertoast.showToast(
           msg: 'Book Added successfully ${user!.displayName ?? loggedInUser.userName}, wait for 5min');
@@ -648,6 +653,3 @@ class _BookShopState extends State<BookShop> {
 
   }
 }
-
-
-

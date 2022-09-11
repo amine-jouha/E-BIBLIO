@@ -1,4 +1,3 @@
-import 'package:ebiblio/MorePages/bookInfos.dart';
 import 'package:ebiblio/MorePages/popBookInfos.dart';
 import 'package:ebiblio/providers/home_provider.dart';
 import 'package:flutter/material.dart';
@@ -69,11 +68,12 @@ class _InfoPopularState extends State<InfoPopular> {
             if (notification.metrics.pixels ==
                 notification.metrics.maxScrollExtent) {
               _getBooksApi();
+              provideer.isLoading = false;
             }
             return true;
 
           },
-          child: provideer.isLoading!
+          child: provideer.isLoading
           ? Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Align(
@@ -83,69 +83,69 @@ class _InfoPopularState extends State<InfoPopular> {
               ),
             ),
           )
-          :SmartRefresher(
-            enablePullDown: true,
-            enablePullUp: true,
-            controller: _controller1,
-            onRefresh: _onRefresh,
-            footer: ClassicFooter(
-              iconPos: IconPosition.top,
-              outerBuilder: (child) {
-                return Container(
-                  width: 80.0,
-                  child: Center(
-                    child: LoadingAnimationWidget.threeArchedCircle(
-                      size: 30, color: Colors.lightBlueAccent,
+          : SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: true,
+              controller: _controller1,
+              onRefresh: _onRefresh,
+              footer: ClassicFooter(
+                iconPos: IconPosition.top,
+                outerBuilder: (child) {
+                  return Container(
+                    width: 80.0,
+                    child: Center(
+                      child: LoadingAnimationWidget.threeArchedCircle(
+                        size: 30, color: Colors.lightBlueAccent,
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-            onLoading: _onLoading,
-            child: Container(
-              child: ListView.separated(
-                primary: false,
-                shrinkWrap: true,
-                controller: _scrollController,
-                scrollDirection: Axis.vertical,
-                itemCount: provideer.books.length,
-                itemBuilder: (context, index) {
-                  final book = provideer.books[index];
-                  return InkWell(
-                    onTap: () {
-                       Navigator.push(context, MaterialPageRoute(builder: (context) => PopBookInfos(
-                           title: book.title,
-                           image: book.thumbnail,
-                           author: book.author,
-                           tag:'fous',
-                           description: book.description,
-                           subtitle: book.subtitle,
-                           publishedDate: book.publishedDate,
-                           pageCount:book.pageCount,
-                           averageRating: book.averageRating
-                       ) ));
-                    },
-                    child: BookWidget(
-                        book.title,
-                        book.subtitle,
-                        book.thumbnail,
-                      book.author,
-                      book.pageCount,
-                      book.description,
-                      book.averageRating,
-                      book.publishedDate
-
-
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return Divider(
-                    color: Color(0xffDADADA),
                   );
                 },
               ),
-            ),
+              onLoading: _onLoading,
+              child: Container(
+                child: ListView.separated(
+                  primary: false,
+                  shrinkWrap: true,
+                  controller: _scrollController,
+                  scrollDirection: Axis.vertical,
+                  itemCount: provideer.books.length,
+                  itemBuilder: (context, index) {
+                    final book = provideer.books[index];
+                    return InkWell(
+                      onTap: () {
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => PopBookInfos(
+                             title: book.title,
+                             image: book.thumbnail,
+                             author: book.author,
+                             tag:'fous',
+                             description: book.description,
+                             subtitle: book.subtitle,
+                             publishedDate: book.publishedDate,
+                             pageCount:book.pageCount,
+                             averageRating: book.averageRating
+                         ) ));
+                      },
+                      child: BookWidget(
+                          book.title,
+                          book.subtitle,
+                          book.thumbnail,
+                          book.author,
+                          book.pageCount,
+                          book.description,
+                          book.averageRating,
+                          book.publishedDate
+
+
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      color: Color(0xffDADADA),
+                    );
+                  },
+                ),
+              ),
           ),
         ),
       ),

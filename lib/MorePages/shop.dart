@@ -8,6 +8,7 @@ import 'package:ebiblio/data_fictif/decFictif.dart';
 import 'package:ebiblio/data_fictif/moFictif.dart';
 import 'package:ebiblio/exten.dart';
 import 'package:ebiblio/model/Book_model.dart';
+import 'package:ebiblio/model/allBook_model.dart';
 import 'package:ebiblio/model/bookModel.dart';
 import 'package:ebiblio/pages_slider/list.dart';
 import 'package:ebiblio/providers/home_provider.dart';
@@ -58,11 +59,21 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
   UserModel loggedInUser = UserModel();
   UserInfos userInfos = UserInfos();
   BookFormShop bookFormInfo = BookFormShop();
+  // AllBook allBook = AllBook();
   List _title = [];
   List _author = [];
   List _image = [];
   List _nums = [];
   List _description = [];
+
+  //for e-biblio shop
+
+  List _title2 = [];
+  List _author2 = [];
+  List _image2 = [];
+  List _nums2 = [];
+  List _description2 = [];
+
 
 
 
@@ -81,13 +92,24 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
     FirebaseFirestore.instance.collection('BookFormShop').doc(user!.uid).get().then((value) {
       this.bookFormInfo = BookFormShop.fromMap(value.data());
       setState(() {});
-
-
-
-      // _provider = Provider.of<HomeProvider>(context, listen: false);
-      // _provider!.query;
-      // _provider?.getBooks();
     });
+
+    // FirebaseFirestore.instance.collection("BookFormShop").get().then((value) {
+    //   value.docs.map((e) {
+    //         // Text((e.data() as Map)["title"]);
+    //     },
+    //   );
+    //   setState(() {});
+    // });
+    // FirebaseFirestore.instance.collection('AllBook').doc().get().then((value) {
+    //   this.allBook = AllBook.fromMap(value.data());
+    //   setState(() {});
+    // });
+
+    // FirebaseFirestore.instance.collection("AllBook").where("author", isNull: false).get().then((value) {
+    //   this.allBook = AllBook.fromMap(value);
+    //   setState(() {});
+    // });
 
   }
 
@@ -331,6 +353,216 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                     }
                 ),)
                       : SvgPicture.asset('assets/svg/nothing.svg',),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text('E-Biblio Books', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),textAlign: TextAlign.start,),
+              ),
+            ),
+            SizedBox(height: 10,),
+            Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width,
+              //your Book
+              child: userInfos.bookInShop != null && userInfos.bookInShop != 0
+                  ? SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                        itemCount: userInfos.bookInShop! + 6,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (BuildContext context, int index) {
+
+                          readBook() async{
+                            // final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+(userInfos.bookInShop!-1).toString()}');
+                            final docUser = FirebaseFirestore.instance.collection('BookFormShop').doc('${user!.uid+index.toString()}');
+                            final snapshot = await docUser.get();
+                            if(snapshot.exists) {
+                              return BookFormShop.fromJson(snapshot.data()!);
+                            }
+                            return null;
+                          };
+
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsBook(
+                                image: _image2[index],
+                                title: _title2[index],
+                                author: _author2[index],
+                                description: _description2[index],
+                                tag: 'r$index',
+                              )));
+                            },
+                            child: Row(
+                              children: [
+                                SizedBox(width: 5,),
+                                Container(
+                                  width: 120,
+                                  child: Column(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:BorderRadius.circular(10),
+                                        child: Container(
+                                          height: sizeX,
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              Opacity(
+                                                opacity:0.5,
+                                                child: FutureBuilder<Widget?>(
+                                                  future: _getImageFB(context, 'book/$index'),
+                                                  builder: (context, snapshot) {
+                                                    print('here isssss $index');
+                                                    if (snapshot.hasData)
+                                                      if (snapshot.connectionState == ConnectionState.done) {
+                                                        _image2.add(snapshot.data);
+                                                        print(_image);
+                                                        print(index);
+                                                        return
+                                                          Container(
+                                                            height: 60,
+                                                            child: snapshot.data ?? Shimmer.fromColors(
+                                                                baseColor: Colors.black12,
+                                                                highlightColor: Colors.white,
+                                                                loop: 5,
+                                                                child: Image.asset('assets/cover2.jpg', fit: BoxFit.cover,)),
+                                                          );
+                                                      }
+                                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                                      return Shimmer.fromColors(
+                                                          baseColor: Colors.black12,
+                                                          highlightColor: Colors.white,
+                                                          loop: 5,
+                                                          child: Image.asset('assets/cover2.jpg', fit: BoxFit.cover,));
+                                                    }
+                                                    else return Shimmer.fromColors(
+                                                        baseColor: Colors.black12,
+                                                        highlightColor: Colors.white,
+                                                        loop: 5,
+                                                        child: Image.asset('assets/cover2.jpg', fit: BoxFit.cover,));
+                                                  },
+                                                ),
+                                              ),
+                                              BackdropFilter(
+                                                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(10.0),
+                                                  child: ClipRRect(
+                                                      borderRadius:BorderRadius.circular(7),
+                                                      child: FutureBuilder<Widget>(
+                                                        future: _getImageFB(context,'book/$index'),
+                                                        builder: (context, snapshot) {
+                                                          if (snapshot.hasData)
+                                                            if (snapshot.connectionState == ConnectionState.done) {
+                                                              return
+                                                                Container(
+                                                                  height: 60,
+                                                                  child: snapshot.data,
+                                                                );
+                                                            }
+                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                            return Shimmer.fromColors(
+                                                                baseColor: Colors.black12,
+                                                                highlightColor: Colors.white,
+                                                                loop: 5,
+                                                                child: Image.asset('assets/cover2.jpg', fit: BoxFit.cover,));
+                                                          }
+                                                          else return Shimmer.fromColors(
+                                                              baseColor: Colors.black12,
+                                                              highlightColor: Colors.white,
+                                                              loop: 5,
+                                                              child: Image.asset('assets/cover2.jpg', fit: BoxFit.cover,));
+                                                        },
+                                                      )
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10,),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: [
+                                            FutureBuilder<BookFormShop?>(
+                                                future: readBook(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+                                                  if (snapshot.hasData) {
+                                                    final userBook = snapshot.data;
+                                                    _title.add(userBook!.title);
+                                                    _author.add(userBook.author);
+                                                    _description.add(userBook.description);
+                                                    print(_title);
+
+                                                    return Text(
+                                                      userBook.title!.toTitleCase(),
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: "Inter",
+                                                          color: Colors.black.withOpacity(0.8),
+                                                          fontSize: 12.5
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:TextOverflow.ellipsis,
+                                                    );
+                                                  }
+                                                  return Center(child: Shimmer.fromColors(
+                                                    baseColor: Colors.black12,
+                                                    highlightColor: Colors.white,
+                                                    loop: 3,
+                                                    child: Container(
+                                                      height: 10,
+                                                      width: 50,
+                                                    ),
+                                                  ));
+
+
+                                                }
+                                            ),
+                                            SizedBox(height: 5,),
+                                            FutureBuilder<BookFormShop?>(
+                                                future: readBook(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+                                                  if (snapshot.hasData) {
+                                                    final userBook = snapshot.data;
+                                                    return userBook == null
+                                                        ? Text('no Price')
+                                                        : Text("${userBook.price!}\$", style: TextStyle(fontWeight: FontWeight.bold),);
+                                                  }
+                                                  return Center(child: Shimmer.fromColors(
+                                                    baseColor: Colors.black12,
+                                                    highlightColor: Colors.white,
+                                                    loop: 3,
+                                                    child: Container(
+                                                      height: 10,
+                                                      width: 50,
+                                                    ),
+                                                  ));
+
+
+                                                }
+                                            ),
+
+
+                                          ],
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: 5,)
+                              ],
+                            ),
+                          );
+                        }
+                ),)
+                  : SvgPicture.asset('assets/svg/nothing.svg',),
             ),
             SizedBox(height: 10,),
             SizedBox(

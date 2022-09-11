@@ -46,6 +46,12 @@
 		<key>UIStatusBarHidden</key>
 		<false/>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
+        <true/>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>Photo Library Usage </string>
+        <key>NSCameraUsageDescription</key>
+        <string>Photo Library Usage to </string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>Photo Library Usage for</string>
 </dict>
 </plist>

@@ -30,8 +30,6 @@ class LoginController with ChangeNotifier {
 
     await FirebaseAuth.instance.signInWithCredential(credential);
 
-    //apres règle ce problème d'ajout-user Amine ok?
-    //update: tout est niquel :)
 
     await FirebaseFirestore.instance
         .collection('Users')
@@ -42,19 +40,6 @@ class LoginController with ChangeNotifier {
       'userName': this._user!.displayName,
       'email': this._user!.email,
     });
-
-    // await FirebaseFirestore.instance.collection('users').add({
-    //   'uid': this._user!.id,
-    //   'userName': this._user!.displayName,
-    //   'email': this._user!.email,
-    // });
-
-    // this.userModel = UserModel(
-    //   uid: this._user!.id,
-    //   userName: this._user!.displayName,
-    //   email: this._user!.email,
-    // );
-    //
 
     notifyListeners();
   }
@@ -68,12 +53,6 @@ class LoginController with ChangeNotifier {
     await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
 
 
-
-    // await FirebaseFirestore.instance.collection('users').add({
-    //   'uid': userData['id'],
-    //   'userName': userData['name'],
-    //   'email': userData['email'],
-    // });
     await FirebaseFirestore.instance
         .collection('Users')
         .where('uid', isNotEqualTo: userData['id'])
@@ -95,9 +74,6 @@ class LoginController with ChangeNotifier {
       redirectURI: 'revivefrr://',
     );
 
-
-
-
     await twitterLogin.loginV2().then((value) async {
       final authToken = value.authToken;
       final authTokenSecret = value.authTokenSecret;
@@ -106,10 +82,8 @@ class LoginController with ChangeNotifier {
         await FirebaseAuth.instance.signInWithCredential(twitterAuthCredentials);
       } else {
         print(authToken);
-        print('Amine regle ce problème et vite');
       }
     });
-
 
 
     // await FirebaseFirestore.instance
