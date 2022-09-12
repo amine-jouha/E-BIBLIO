@@ -493,9 +493,9 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                                                   if (snapshot.hasError) return Text('Error = ${snapshot.error}');
                                                   if (snapshot.hasData) {
                                                     final userBook = snapshot.data;
-                                                    _title.add(userBook!.title);
-                                                    _author.add(userBook.author);
-                                                    _description.add(userBook.description);
+                                                    _title2.add(userBook!.title);
+                                                    _author2.add(userBook.author);
+                                                    _description2.add(userBook.description);
                                                     print(_title);
 
                                                     return Text(
