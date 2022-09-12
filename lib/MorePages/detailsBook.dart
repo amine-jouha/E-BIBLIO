@@ -58,8 +58,10 @@ class _DetailsBookState extends State<DetailsBook> {
                       backgroundColor: MaterialStateProperty.all(Colors.grey.shade400),
                       minimumSize: MaterialStateProperty.all(Size.square(50))
                   ),
-                  onPressed: () {},
-                  child: Icon(Icons.bookmark)
+                  onPressed: () {
+
+                  },
+                  child: Icon(Icons.bookmark,)
               ),
             ),
             SizedBox(width: 20,),

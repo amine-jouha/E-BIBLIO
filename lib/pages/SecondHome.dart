@@ -190,7 +190,9 @@ class _SecondHomeState extends State<SecondHome> {
                   ],
                 ),
               ))
+
       );
+
     }
     Future.delayed(Duration(seconds: 4), () {
       if (userInfos.ville == null) {
@@ -403,8 +405,7 @@ class _SecondHomeState extends State<SecondHome> {
                                                       padding: const EdgeInsets.only(bottom: 10.0),
                                                       child: Text(onFictif[index].title.toTitleCase(), style: TextStyle(color: Colors.black12, fontSize: 15,),),
                                                     ),
-                                                    Text('loading text from app tout ce que veut la population comme ci de'
-                                                        ' rien etait quand tout le monde sait'.toTitleCase(), style: TextStyle(
+                                                    Text(onFictif[index].title.toTitleCase(), style: TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 17,
                                                         letterSpacing: 0.3,
@@ -489,8 +490,7 @@ class _SecondHomeState extends State<SecondHome> {
                                                       padding: const EdgeInsets.only(bottom: 10.0),
                                                       child: Text('data of books', style: TextStyle(color: Colors.black12, fontSize: 15,),),
                                                     ),
-                                                    Text('loading text from app tout ce que veut la population comme ci de'
-                                                        ' rien etait quand tout le monde sait', style: TextStyle(
+                                                    Text(onFictif[index].title, style: TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 18,
                                                         letterSpacing: 0.3,
@@ -723,7 +723,7 @@ class _SecondHomeState extends State<SecondHome> {
                   ),
                   Divider(),
                   Container(
-                    color: Colors.grey,
+                    // color: Colors.grey,
                     height: 60,
                   ),
                 ],
@@ -906,7 +906,7 @@ class _SecondHomeState extends State<SecondHome> {
       opacityShadow: 0.8,
       onFinish: () {
         print("finish");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MessagePage()), (route) => false);
+        // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MessagePage()), (route) => false);
 
       },
       onClickTarget: (target) {
@@ -914,7 +914,7 @@ class _SecondHomeState extends State<SecondHome> {
       },
       onSkip: () {
         print("skip");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MessagePage()), (route) => false);
+        // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MessagePage()), (route) => false);
 
       },
       onClickOverlay: (target) {

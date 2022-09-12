@@ -46,7 +46,7 @@ class _AudioBookPageState extends State<AudioBookPage> {
               padding: const EdgeInsets.all(18.0),
               child: Column(
                 children: [
-                  AddRemoveSongButtons(),
+                  // AddRemoveSongButtons(),
                   AudioProgressBar(),
                   AudioControlButtons(),
                 ],
@@ -188,7 +188,7 @@ class _ImageBookState extends State<ImageBook> {
                       enableInfiniteScroll: false,
                       autoPlayAnimationDuration: const Duration(milliseconds: 800),
                       viewportFraction: 0.8,
-                      height: 400,
+                      height: 450,
                       onPageChanged: (value, carousel) {
                         setState(() {
                           print(value);

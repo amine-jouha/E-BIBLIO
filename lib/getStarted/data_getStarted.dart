@@ -14,21 +14,21 @@ List<OnBoarding> onboardingContents = [
   OnBoarding(
       title: 'REVIVE THE SPIRIT OF\n YOUR BOOK',
       image: 'assets/seller2.gif',
-      description: 'yes we are here bro what do you think we are haha'
+      description: 'Give to your book\nexperience and another life '
   ),
   OnBoarding(
       title: 'DISCOVER NEW METHODS\n TO LEARN BOOKS',
       image: 'assets/loverbook2.gif',
-      description: 'yes we say somting to you because of you are now think we are haha'
+      description: 'Here you can simply Discover\nSome New and original Book'
   ),
   OnBoarding(
       title: 'DISCOVER NEW BOOKS\n AUTHORS PRICES',
       image: 'assets/author2.gif',
-      description: 'naah bro i just saw a lot of bears in plage last sunday re here bro think we are haha'
+      description: 'Search your book and You will\nfind a lot of type in your city'
   ),
   OnBoarding(
       title: 'E-BIBLIO\n MARKET PLACE',
       image: 'assets/cash2.gif',
-      description: 'one piece is the best manga of this fucking worldre bro what do you think we are haha'
+      description: 'Give to your book\nexperience and another life'
   ),
 ];

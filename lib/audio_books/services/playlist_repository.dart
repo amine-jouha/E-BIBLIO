@@ -8,7 +8,7 @@ abstract class PlaylistRepository {
 class DemoPlaylist extends PlaylistRepository {
   @override
   Future<List<Map<String, String>>> fetchInitialPlaylist(
-      {int length = 4}) async {
+      {int length = 9}) async {
     return List.generate(length, (index) => _nextSong());
   }
 

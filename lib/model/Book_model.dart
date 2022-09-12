@@ -7,10 +7,11 @@ class BookFormShop {
   String? numPage;
   String? dateBook;
   String? price;
+  bool? isSave;
   String? condition;
   String? description;
 
-  BookFormShop({this.uid, this.title, this.author, this.dateBook, this.numPage, this.description, this.condition, this.price});
+  BookFormShop({this.uid, this.title, this.author, this.dateBook, this.numPage, this.description, this.condition, this.price, this.isSave});
 
   //receiving data from server
   factory BookFormShop.fromMap(map) {
@@ -21,6 +22,7 @@ class BookFormShop {
       numPage: map['numPage'],
       dateBook: map['dateBook'],
       price: map['price'],
+      isSave: map['isSave'],
       condition: map['condition'],
       description: map['description'],
 
@@ -37,6 +39,7 @@ class BookFormShop {
       'numPage': numPage,
       'dateBook': dateBook,
       'price': price,
+      'isSave': isSave,
       'condition': condition,
       'description': description
 
@@ -51,6 +54,7 @@ class BookFormShop {
     numPage = json['numPage'];
     dateBook = json['dateBook'];
     price = json['price'];
+    isSave = json['isSave'];
     condition = json['condition'];
     description = json['description'];
   }
@@ -62,6 +66,7 @@ class BookFormShop {
     data['numPage'] = this.numPage;
     data['dateBook'] = this.dateBook;
     data['price'] = this.price;
+    data['isSave'] = this.isSave;
     data['condition'] = this.condition;
     data['description'] = this.description;
 

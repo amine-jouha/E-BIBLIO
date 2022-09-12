@@ -64,7 +64,7 @@ class _MyDialogState extends State<MyDialog> {
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       body: isComplete ?
-      Container(child: confirm(ville!, type),) :
+      confirm(ville!, type) :
       SingleChildScrollView(
         child: Center(
           child: SingleChildScrollView(
@@ -220,6 +220,7 @@ class _MyDialogState extends State<MyDialog> {
     // );
 
     await firebaseFirestore.collection('UserInfo').doc(user!.uid).set(userInfos.toMap());
+    Navigator.of(context).pop();
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => BottomNav()), (route) => false);
 
 

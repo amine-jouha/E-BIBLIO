@@ -2,6 +2,7 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebiblio/AddBookToShop/bookShop.dart';
+import 'package:ebiblio/MorePages/ProfilePage.dart';
 import 'package:ebiblio/MorePages/shop.dart';
 import 'package:ebiblio/pages/SecondHome.dart';
 import 'package:ebiblio/upgradeAccount/backToOld.dart';
@@ -11,12 +12,14 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../MorePages/settingsPage.dart';
 import '../audio_books/audioBook_page.dart';
 import '../auth_users/Login.dart';
 import '../controllers/google_signin_controller.dart';
 import '../model/userInfo_model.dart';
 import '../model/user_model.dart';
 import '../upgradeAccount/upgradeAccount.dart';
+import 'BookMark.dart';
 import 'message_Page.dart';
 
 class BottomNav extends StatefulWidget {
@@ -227,7 +230,7 @@ class _BottomNavState extends State<BottomNav> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(onPressed: () {}, icon: Icon(LineAwesomeIcons.qrcode, color: Colors.white,)),
-            IconButton(onPressed: () {}, icon: Icon(LineAwesomeIcons.invision, color: Colors.white,))
+            IconButton(onPressed: () {}, icon: Icon(LineAwesomeIcons.telegram, color: Colors.white,))
           ],
         ),
 
@@ -255,7 +258,9 @@ class _BottomNavState extends State<BottomNav> {
         // Icon(LineAwesomeIcons.bars, color: Colors.black),
         // IconButton(icon: Icon(LineAwesomeIcons.bars, color:Colors.black ,), onPressed: () {  },),
         actions: [
-          IconButton(icon: Icon(LineAwesomeIcons.user,color: Colors.black,), onPressed: () {},),
+          IconButton(icon: Icon(LineAwesomeIcons.user,color: Colors.black,), onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage1()));
+          },),
         ],),
       drawerEnableOpenDragGesture: true,
       drawerEdgeDragWidth: 50,
@@ -272,9 +277,9 @@ class _BottomNavState extends State<BottomNav> {
           },
           children: <Widget>[
             SecondHome(),
-            Container(color: Colors.red,),
+            BookMark(),
             Container(color: Colors.green,),
-            Container(color: Colors.blue,),
+            SettingsPage(),
           ],
         ),
       ),

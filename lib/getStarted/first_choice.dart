@@ -100,8 +100,8 @@ class _FirstChoiceState extends State<FirstChoice> {
                           borderRadius: BorderRadius.circular(50)
                       ),
                       child: circle
-                          ?CircularProgressIndicator(color: Colors.black,)
-                          :Text("Login", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,),),
+                          ? CircularProgressIndicator(color: Colors.black,)
+                          : Text("Login", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,),),
                     ),
                   ),
                   SizedBox(height: 15,),

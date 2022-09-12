@@ -183,6 +183,14 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                               };
 
                               return InkWell(
+                                onLongPress: () async{
+                                  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+                                  await firebaseFirestore.collection('BookFormShop').doc(user!.uid).update({"isSave" : true}).then((value)
+                                  => print("successfuly updated! bro"),
+                                      onError: (e) => print('Error Updating Document $e')
+                                  );
+
+                                },
                                   onTap: () {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsBook(
                                       image: _image[index],
@@ -562,7 +570,7 @@ class _ShopEbiblioState extends State<ShopEbiblio> {
                           );
                         }
                 ),)
-                  : SvgPicture.asset('assets/svg/nothing.svg',),
+                  :  SvgPicture.asset('assets/svg/woman.svg')
             ),
             SizedBox(height: 10,),
             SizedBox(

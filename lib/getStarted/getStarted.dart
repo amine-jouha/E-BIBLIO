@@ -1,3 +1,4 @@
+import 'package:ebiblio/auth_users/Login.dart';
 import 'package:flutter/material.dart';
 import 'package:ebiblio/getStarted/data_getStarted.dart';
 import 'package:ebiblio/pages/SecondHome.dart';
@@ -67,7 +68,7 @@ class _getStartedState extends State<getStarted> {
                             style: kTitle,
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: sizeV * 5,),
+                          // SizedBox(height: sizeV * 5,),
                           Container(
                             height: sizeV * 50,
                             child: Image.asset(onboardingContents[index].image,fit: BoxFit.contain,),
@@ -79,6 +80,7 @@ class _getStartedState extends State<getStarted> {
                                   style: kBodyText1,
                                   children: [
                                     TextSpan(text: onboardingContents[index].description)
+                                    // TextSpan(text: onboardingContents[index].title)
                                     // TextSpan(text:'WE ARE HERE FOR '),
                                     // TextSpan(text:'YOUR PLEASURE ', style: TextStyle(color: kPrimaryColor)),
                                     // TextSpan(text:'TO BE BETTER '),
@@ -99,14 +101,14 @@ class _getStartedState extends State<getStarted> {
                       currentPage == onboardingContents.length -1?
                       MyButton(buttonName: 'Login',
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MyHome()), (route) => false);
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen()), (route) => false);
                           } ,
                           bgColor: Colors.brown):
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           OnBoardNavBtn(name: 'Skip', onPressed: () {
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SecondHome(),),(route) => false);
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen(),),(route) => false);
                           }),
                           Row(
                             children: List.generate(

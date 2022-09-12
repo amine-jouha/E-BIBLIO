@@ -1,6 +1,7 @@
 import 'package:ebiblio/audio_books/services/service_locator.dart';
 import 'package:ebiblio/providers/addBook_provider.dart';
 import 'package:ebiblio/providers/home_provider.dart';
+import 'package:ebiblio/providers/theme-provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -69,21 +70,48 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LoginController()),
         ChangeNotifierProvider(create: (context) => addBookProvider()),
-        ChangeNotifierProvider(create: (context) => HomeProvider())
+        ChangeNotifierProvider(create: (context) => HomeProvider()),
+        ChangeNotifierProvider(create:(context) => ThemeProvider(),),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.brown,
-          // brightness: Brightness.dark
-        ),
-        home: FirstChoice(),
-        // getStarted(),
+      child:ChangeNotifierProvider<ThemeProvider>(
+        create: (_) => ThemeProvider(),
+        builder: (context,_) {
+          final themeProvider = Provider.of<ThemeProvider>(context);
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            // theme: ThemeData(
+            //   // brightness: Brightness.dark,
+            //   primarySwatch: Colors.blue,
+            // ),
+            themeMode: themeProvider.themeMode,
+            theme: MyThemes.lightTheme,
+            darkTheme: MyThemes.darkTheme,
+            home: FirstChoice(),
+
+
+          );},
       ),
+      // MaterialApp(
+      //   debugShowCheckedModeBanner: false,
+      //   themeMode: themeProvider.themeMode,
+      //   theme: MyThemes.lightTheme,
+      //   darkTheme: MyThemes.darkTheme,
+      //   // darkTheme: ThemeData(
+      //   //   brightness: Brightness.dark,
+      //   // ),
+      //   // theme: ThemeData(
+      //   //   // primarySwatch: Colors.brown,
+      //   //   brightness: Brightness.light
+      //   // ),
+      //   home: FirstChoice(),
+      //   // getStarted(),
+      // ),
     );
   }
 }

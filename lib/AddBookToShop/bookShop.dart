@@ -628,6 +628,7 @@ class _BookShopState extends State<BookShop> {
       bookFormShop.price = price;
       bookFormShop.condition = condition;
       bookFormShop.description = description;
+      bookFormShop.isSave = false;
 
       uploadSelectedImages();
 
